@@ -1,31 +1,37 @@
-import { Query } from "node-appwrite";
-import { DATABASE_ID, MEMBERS_ID, WORKSPACES_ID } from "@/config";
-import { createSessionClient } from "@/lib/appwrite";
+import { auth } from "@/auth";
+import { connectToDatabase } from "@/lib/db/connect";
+import { MemberModel, WorkspaceModel } from "@/lib/db/models";
 
 export const getWorkspaces = async () => {
-  const { tables, account } = await createSessionClient();
-  const user = await account.get();
+  const session = await auth();
 
-  const members = await tables.listRows({
-    databaseId: DATABASE_ID,
-    tableId: MEMBERS_ID,
-    queries: [Query.equal("userId", user.$id)],
-  });
-
-  if (members.total === 0) {
+  if (!session?.user?.id) {
     return { rows: [], total: 0 };
   }
 
-  const workspaceIds = members.rows.map((m) => m.workspaceId);
+  await connectToDatabase();
 
-  const workspaces = await tables.listRows({
-    databaseId: DATABASE_ID,
-    tableId: WORKSPACES_ID,
-    queries: [
-      Query.contains("$id", workspaceIds),
-      Query.orderDesc("$createdAt"),
-    ],
-  });
+  const members = await MemberModel.find({
+    userId: session.user.id,
+  }).lean();
 
-  return workspaces;
+  if (members.length === 0) {
+    return { rows: [], total: 0 };
+  }
+
+  const workspaceIds = members.map((member) => member.workspaceId);
+
+  const workspaces = await WorkspaceModel.find({
+    _id: { $in: workspaceIds },
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return {
+    rows: workspaces.map((workspace) => ({
+      ...workspace,
+      $id: workspace._id.toString(),
+    })),
+    total: workspaces.length,
+  };
 };
