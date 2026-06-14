@@ -1,15 +1,31 @@
-import { sessionMiddleware } from "@/lib/session-middleware";
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { createTaskSchema } from "../schemas";
-import { getMember } from "../../members/utils";
-import { DATABASE_ID, MEMBERS_ID, PROJECTS_ID, TASKS_ID } from "@/config";
-import { ID, Query } from "node-appwrite";
+import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { Task, TaskStatus } from "../types";
-import { createAdminClient } from "@/lib/appwrite";
-import { Project } from "../../projects/types";
-import { handle } from "hono/vercel";
+
+import { sessionMiddleware } from "@/lib/session-middleware";
+import { connectToDatabase } from "@/lib/db/connect";
+import { MemberModel, ProjectModel, TaskModel } from "@/lib/db/models";
+import { getMember } from "../../members/utils";
+import { createTaskSchema } from "../schemas";
+import { TaskStatus } from "../types";
+
+const serializeTask = (task: { _id: unknown; [key: string]: unknown }) => ({
+  ...task,
+  $id: String(task._id),
+});
+
+const serializeProject = (project: {
+  _id: unknown;
+  [key: string]: unknown;
+}) => ({
+  ...project,
+  $id: String(project._id),
+});
+
+const serializeMember = (member: { _id: unknown; [key: string]: unknown }) => ({
+  ...member,
+  $id: String(member._id),
+});
 
 const app = new Hono()
   .get(
@@ -24,290 +40,241 @@ const app = new Hono()
         status: z.enum(TaskStatus).nullish(),
         search: z.string().nullish(),
         dueDate: z.string().nullish(),
-      })
+      }),
     ),
     async (c) => {
-      const { users } = await createAdminClient();
-      const tables = c.get("tables");
       const user = c.get("user");
-
       const { workspaceId, projectId, status, search, assigneeId, dueDate } =
         c.req.valid("query");
 
+      await connectToDatabase();
+
       const member = await getMember({
-        tables,
         workspaceId,
-        userId: user.$id,
+        userId: user.id,
       });
 
       if (!member) {
         return c.json({ error: "Unauthorized" }, 403);
       }
 
-      const query = [
-        Query.equal("workspaceId", workspaceId),
-        Query.orderDesc("$createdAt"),
-      ];
+      const filter: Record<string, unknown> = {
+        workspaceId,
+      };
 
-      if (projectId) {
-        console.log("projectId: ", projectId);
-        query.push(Query.equal("projectId", projectId));
-      }
+      if (projectId) filter.projectId = projectId;
+      if (status) filter.status = status;
+      if (assigneeId) filter.assigneeId = assigneeId;
+      if (dueDate) filter.dueDate = new Date(dueDate);
+      if (search) filter.name = { $regex: search, $options: "i" };
 
-      if (status) {
-        console.log("status: ", status);
-        query.push(Query.equal("status", status));
-      }
+      const tasks = await TaskModel.find(filter).sort({ createdAt: -1 }).lean();
 
-      if (assigneeId) {
-        console.log("assigneeId: ", assigneeId);
-        query.push(Query.equal("assigneeId", assigneeId));
-      }
+      const projectIds = [...new Set(tasks.map((task) => task.projectId))];
+      const assigneeIds = [...new Set(tasks.map((task) => task.assigneeId))];
 
-      if (dueDate) {
-        console.log("dueDate: ", dueDate);
-        query.push(Query.equal("dueDate", dueDate));
-      }
+      const projects = await ProjectModel.find({
+        _id: { $in: projectIds },
+      }).lean();
 
-      if (search) {
-        console.log("search: ", search);
-        query.push(Query.search("name", search));
-      }
+      const members = await MemberModel.find({
+        _id: { $in: assigneeIds },
+      }).lean();
 
-      const tasks = await tables.listRows<Task>({
-        databaseId: DATABASE_ID,
-        tableId: TASKS_ID,
-        queries: query,
-      });
-
-      const projectIds = tasks.rows.map((task) => task.projectId);
-      const assigneeIds = tasks.rows.map((task) => task.assigneeId);
-
-      const projects = await tables.listRows<Project>({
-        databaseId: DATABASE_ID,
-        tableId: PROJECTS_ID,
-        queries:
-          projectIds.length > 0 ? [Query.contains("$id", projectIds)] : [],
-      });
-
-      const members = await tables.listRows({
-        databaseId: DATABASE_ID,
-        tableId: MEMBERS_ID,
-        queries:
-          assigneeIds.length > 0 ? [Query.contains("$id", assigneeIds)] : [],
-      });
-
-      const assignees = await Promise.all(
-        members.rows.map(async (member) => {
-          const user = await users.get(member.userId);
-          return {
-            ...member,
-            name: user.name,
-            email: user.email,
-          };
-        })
-      );
-
-      const populatedTasks = tasks.rows.map((task) => {
-        const project = projects.rows.find(
-          (project) => project.$id === task.projectId
-        );
-        const assignee = assignees.find(
-          (assignee) => assignee.$id === task.assigneeId
+      const populatedTasks = tasks.map((task) => {
+        const project = projects.find(
+          (project) => String(project._id) === task.projectId,
         );
 
-        return {
+        const assignee = members.find(
+          (member) => String(member._id) === task.assigneeId,
+        );
+
+        return serializeTask({
           ...task,
-          project,
-          assignee,
-        };
+          project: project ? serializeProject(project) : undefined,
+          assignee: assignee
+            ? serializeMember({
+                ...assignee,
+                name: assignee.userId === user.id ? (user.name ?? "") : "",
+                email: assignee.userId === user.id ? (user.email ?? "") : "",
+              })
+            : undefined,
+        });
       });
 
       return c.json({
         data: {
-          ...tasks,
           rows: populatedTasks,
+          total: populatedTasks.length,
         },
       });
-    }
+    },
   )
+
   .post(
     "/",
     sessionMiddleware,
     zValidator("json", createTaskSchema),
     async (c) => {
       const user = c.get("user");
-      const tables = c.get("tables");
       const { name, status, workspaceId, projectId, dueDate, assigneeId } =
         c.req.valid("json");
 
+      await connectToDatabase();
+
       const member = await getMember({
-        tables,
         workspaceId,
-        userId: user.$id,
+        userId: user.id,
       });
 
       if (!member) {
         return c.json({ error: "Unauthorized" }, 403);
       }
 
-      const highestPositionTask = await tables.listRows({
-        databaseId: DATABASE_ID,
-        tableId: TASKS_ID,
-        queries: [
-          Query.equal("status", status),
-          Query.equal("workspaceId", workspaceId),
-          Query.orderAsc("position"),
-          Query.limit(1),
-        ],
+      const highestPositionTask = await TaskModel.findOne({
+        workspaceId,
+        status,
+      })
+        .sort({ position: -1 })
+        .lean();
+
+      const newPosition = highestPositionTask
+        ? highestPositionTask.position + 1000
+        : 1000;
+
+      const task = await TaskModel.create({
+        name,
+        status,
+        workspaceId,
+        projectId,
+        dueDate,
+        assigneeId,
+        position: newPosition,
+        description: null,
       });
 
-      const newPosition =
-        highestPositionTask.rows.length > 0
-          ? highestPositionTask.rows[0].position + 1000
-          : 1000;
-
-      const task = await tables.createRow({
-        databaseId: DATABASE_ID,
-        tableId: TASKS_ID,
-        rowId: ID.unique(),
-        data: {
-          name,
-          status,
-          workspaceId,
-          projectId,
-          dueDate,
-          assigneeId,
-          position: newPosition,
-        },
+      return c.json({
+        data: serializeTask(task.toObject()),
       });
-
-      return c.json({ data: task });
-    }
+    },
   )
-  .delete("/:taskId", sessionMiddleware, async (c) => {
-    const user = c.get("user");
-    const tables = c.get("tables");
-    const { taskId } = c.req.param();
 
-    const task = await tables.getRow<Task>({
-      databaseId: DATABASE_ID,
-      tableId: TASKS_ID,
-      rowId: taskId,
-    });
-
-    const member = await getMember({
-      tables,
-      workspaceId: task.workspaceId,
-      userId: user.$id,
-    });
-
-    if (!member) {
-      return c.json({ error: "Unauthorized" }, 403);
-    }
-
-    await tables.deleteRow({
-      databaseId: DATABASE_ID,
-      tableId: TASKS_ID,
-      rowId: taskId,
-    });
-
-    return c.json({ data: { $id: task.$id } });
-  })
-  .patch(
-    "/:taskId",
-    sessionMiddleware,
-    zValidator("json", createTaskSchema.partial()),
-    async (c) => {
-      const user = c.get("user");
-      const tables = c.get("tables");
-      const { name, status, description, projectId, dueDate, assigneeId } =
-        c.req.valid("json");
-      const { taskId } = c.req.param();
-
-      const existingTask = await tables.getRow<Task>({
-        databaseId: DATABASE_ID,
-        tableId: TASKS_ID,
-        rowId: taskId,
-      });
-
-      const member = await getMember({
-        tables,
-        workspaceId: existingTask.workspaceId,
-        userId: user.$id,
-      });
-
-      if (!member) {
-        return c.json({ error: "Unauthorized" }, 403);
-      }
-
-      const task = await tables.updateRow<Task>({
-        databaseId: DATABASE_ID,
-        tableId: TASKS_ID,
-        rowId: taskId,
-        data: {
-          name,
-          status,
-          projectId,
-          assigneeId,
-          ...(dueDate && { dueDate: dueDate.toISOString() }),
-          description,
-        },
-      });
-
-      return c.json({ data: task });
-    }
-  )
   .get("/:taskId", sessionMiddleware, async (c) => {
-    const currentUser = c.get("user");
-    const tables = c.get("tables");
-    const { users } = await createAdminClient();
+    const user = c.get("user");
     const { taskId } = c.req.param();
 
-    const task = await tables.getRow<Task>({
-      databaseId: DATABASE_ID,
-      tableId: TASKS_ID,
-      rowId: taskId,
-    });
+    await connectToDatabase();
+
+    const task = await TaskModel.findById(taskId).lean();
+
+    if (!task) {
+      return c.json({ error: "Task not found" }, 404);
+    }
 
     const currentMember = await getMember({
-      tables,
       workspaceId: task.workspaceId,
-      userId: currentUser.$id,
+      userId: user.id,
     });
 
     if (!currentMember) {
       return c.json({ error: "Unauthorized" }, 403);
     }
 
-    const project = await tables.getRow({
-      databaseId: DATABASE_ID,
-      tableId: PROJECTS_ID,
-      rowId: task.projectId,
+    const project = await ProjectModel.findById(task.projectId).lean();
+    const assignee = await MemberModel.findById(task.assigneeId).lean();
+
+    return c.json({
+      data: serializeTask({
+        ...task,
+        project: project ? serializeProject(project) : undefined,
+        assignee: assignee
+          ? serializeMember({
+              ...assignee,
+              name: assignee.userId === user.id ? (user.name ?? "") : "",
+              email: assignee.userId === user.id ? (user.email ?? "") : "",
+            })
+          : undefined,
+      }),
+    });
+  })
+
+  .patch(
+    "/:taskId",
+    sessionMiddleware,
+    zValidator("json", createTaskSchema.partial()),
+    async (c) => {
+      const user = c.get("user");
+      const { taskId } = c.req.param();
+      const { name, status, description, projectId, dueDate, assigneeId } =
+        c.req.valid("json");
+
+      await connectToDatabase();
+
+      const existingTask = await TaskModel.findById(taskId).lean();
+
+      if (!existingTask) {
+        return c.json({ error: "Task not found" }, 404);
+      }
+
+      const member = await getMember({
+        workspaceId: existingTask.workspaceId,
+        userId: user.id,
+      });
+
+      if (!member) {
+        return c.json({ error: "Unauthorized" }, 403);
+      }
+
+      const task = await TaskModel.findByIdAndUpdate(
+        taskId,
+        {
+          ...(name !== undefined && { name }),
+          ...(status !== undefined && { status }),
+          ...(projectId !== undefined && { projectId }),
+          ...(assigneeId !== undefined && { assigneeId }),
+          ...(dueDate !== undefined && { dueDate }),
+          ...(description !== undefined && { description }),
+        },
+        { new: true },
+      ).lean();
+
+      return c.json({
+        data: serializeTask(task!),
+      });
+    },
+  )
+
+  .delete("/:taskId", sessionMiddleware, async (c) => {
+    const user = c.get("user");
+    const { taskId } = c.req.param();
+
+    await connectToDatabase();
+
+    const task = await TaskModel.findById(taskId).lean();
+
+    if (!task) {
+      return c.json({ error: "Task not found" }, 404);
+    }
+
+    const member = await getMember({
+      workspaceId: task.workspaceId,
+      userId: user.id,
     });
 
-    const member = await tables.getRow({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_ID,
-      rowId: task.assigneeId,
-    });
+    if (!member) {
+      return c.json({ error: "Unauthorized" }, 403);
+    }
 
-    const user = await users.get(member.userId);
-
-    const assignee = {
-      ...member,
-      name: user.name,
-      email: user.email,
-    };
+    await TaskModel.findByIdAndDelete(taskId);
 
     return c.json({
       data: {
-        ...task,
-        project,
-        assignee,
+        $id: taskId,
       },
     });
   })
+
   .post(
     "/bulk-update",
     sessionMiddleware,
@@ -319,40 +286,38 @@ const app = new Hono()
             $id: z.string(),
             status: z.enum(TaskStatus),
             position: z.number().int().positive().min(1000).max(1_000_000),
-          })
+          }),
         ),
-      })
+      }),
     ),
     async (c) => {
-      const tables = c.get("tables");
       const user = c.get("user");
-      const { tasks } = await c.req.valid("json");
+      const { tasks } = c.req.valid("json");
 
-      const tasksToUpdate = await tables.listRows<Task>({
-        databaseId: DATABASE_ID,
-        tableId: TASKS_ID,
-        queries: [
-          Query.contains(
-            "$id",
-            tasks.map((task) => task.$id)
-          ),
-        ],
-      });
+      await connectToDatabase();
+
+      const taskIds = tasks.map((task) => task.$id);
+
+      const tasksToUpdate = await TaskModel.find({
+        _id: { $in: taskIds },
+      }).lean();
 
       const workspaceIds = new Set(
-        tasksToUpdate.rows.map((task) => task.workspaceId)
+        tasksToUpdate.map((task) => task.workspaceId),
       );
 
       if (workspaceIds.size !== 1) {
-        return c.json({ error: "All tasks must belong to the same workspace" });
+        return c.json(
+          { error: "All tasks must belong to the same workspace" },
+          400,
+        );
       }
 
       const workspaceId = workspaceIds.values().next().value as string;
 
       const member = await getMember({
-        tables,
         workspaceId,
-        userId: user.$id,
+        userId: user.id,
       });
 
       if (!member) {
@@ -360,23 +325,22 @@ const app = new Hono()
       }
 
       const updatedTasks = await Promise.all(
-        tasks.map(async (task) => {
-          const { $id, status, position } = task;
-          return tables.updateRow<Task>({
-            databaseId: DATABASE_ID,
-            tableId: TASKS_ID,
-            rowId: $id,
-            data: { status, position },
-          });
-        })
+        tasks.map((task) =>
+          TaskModel.findByIdAndUpdate(
+            task.$id,
+            {
+              status: task.status,
+              position: task.position,
+            },
+            { new: true },
+          ).lean(),
+        ),
       );
 
-      return c.json({ data: updatedTasks });
-    }
+      return c.json({
+        data: updatedTasks.filter(Boolean).map((task) => serializeTask(task!)),
+      });
+    },
   );
 
 export default app;
-export const GET = handle(app);
-export const POST = handle(app);
-export const PATCH = handle(app);
-export const DELETE = handle(app);
