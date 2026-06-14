@@ -14,7 +14,7 @@ export const useGetWorkspaceInfo = ({
       const response = await client.api.workspaces[":workspaceId"]["info"].$get(
         {
           param: { workspaceId },
-        }
+        },
       );
 
       if (!response.ok) {

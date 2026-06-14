@@ -26,7 +26,7 @@ export const MemberList = () => {
   const [ConfirmDialog, confirm] = useConfirm(
     "Remove member",
     "This member will be removed from the workspace",
-    "destructive"
+    "destructive",
   );
 
   const { data } = useGetMembers({ workspaceId });
@@ -71,18 +71,20 @@ export const MemberList = () => {
               <MemberAvatar
                 className="size-10"
                 fallbackClassName="text-lg"
-                name={member.name}
+                name={member.name ?? "User"}
               />
               <div className="flex flex-col">
                 <p className="text-sm font-medium">
-                  {member.name}
+                  {member.name ?? "User"}
                   {member.role === MemberRole.ADMIN && (
                     <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-muted text-blue-700 dark:text-blue-500 font-semibold ml-2">
                       ADMIN
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-muted-foreground">{member.email}</p>
+                <p className="text-xs text-muted-foreground">
+                  {member.email ?? "No email"}
+                </p>
               </div>
               {member.role === MemberRole.ADMIN && (
                 <DropdownMenu>
@@ -115,7 +117,7 @@ export const MemberList = () => {
                       onClick={() => handleDeleteMember(member.$id)}
                       disabled={isDeletingMember}
                     >
-                      Remove {member.name}
+                      Remove {member.name ?? "User"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

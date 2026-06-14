@@ -45,17 +45,17 @@ export const columns: ColumnDef<Task>[] = [
     },
     cell: ({ row }) => {
       const task = row.original as Task & {
-        project: { name: string; imageUrl: string };
+        project?: { name?: string; imageUrl?: string | null };
       };
 
       return (
         <div className="flex items-center gap-x-2 text-sm font-medium">
           <ProjectAvatar
             className="size-6"
-            name={task.project.name}
-            image={task.project.imageUrl}
+            name={task.project?.name ?? "Project"}
+            image={task.project?.imageUrl ?? undefined}
           />
-          <p className="line-clamp-1">{task.project.name}</p>
+          <p className="line-clamp-1">{task.project?.name ?? "Project"}</p>
         </div>
       );
     },
@@ -75,7 +75,7 @@ export const columns: ColumnDef<Task>[] = [
     },
     cell: ({ row }) => {
       const task = row.original as Task & {
-        assignee: { name: string; imageUrl: string };
+        assignee?: { name?: string };
       };
 
       return (
@@ -83,9 +83,9 @@ export const columns: ColumnDef<Task>[] = [
           <MemberAvatar
             className="size-6"
             fallbackClassName="text-xs"
-            name={task.assignee.name}
+            name={task.assignee?.name ?? "User"}
           />
-          <p className="line-clamp-1">{task.assignee.name}</p>
+          <p className="line-clamp-1">{task.assignee?.name ?? "User"}</p>
         </div>
       );
     },
@@ -106,7 +106,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       const dueDate = row.original.dueDate;
 
-      return <TaskDate value={dueDate} />;
+      return <TaskDate value={new Date(dueDate).toISOString()} />;
     },
   },
   {

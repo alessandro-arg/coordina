@@ -5,6 +5,7 @@ import { EditProjectForm } from "@/app/features/projects/components/edit-project
 import { useProjectId } from "@/app/features/projects/hooks/use-project-id";
 import { PageError } from "@/components/page-error";
 import { PageLoader } from "@/components/page-loader";
+import { Project } from "@/app/features/projects/types";
 
 export const ProjectIdSettingsClient = () => {
   const projectId = useProjectId();
@@ -18,9 +19,11 @@ export const ProjectIdSettingsClient = () => {
     return <PageError message="Project not found" />;
   }
 
+  const project = initialValues as unknown as Project;
+
   return (
     <div className="w-full lg:max-w-xl">
-      <EditProjectForm initialValues={initialValues} />
+      <EditProjectForm initialValues={project} />
     </div>
   );
 };

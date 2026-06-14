@@ -12,6 +12,8 @@ const serializeMember = (member: {
   userId: string;
   workspaceId: string;
   role: string;
+  name?: string;
+  email?: string;
 }) => ({
   ...member,
   $id: String(member._id),
@@ -44,10 +46,13 @@ const app = new Hono()
 
       const populatedMembers = members.map((member) =>
         serializeMember({
-          ...member,
+          _id: member._id,
+          userId: member.userId,
+          workspaceId: member.workspaceId,
+          role: member.role,
           name: member.userId === user.id ? (user.name ?? "") : "",
           email: member.userId === user.id ? (user.email ?? "") : "",
-        } as any),
+        }),
       );
 
       return c.json({

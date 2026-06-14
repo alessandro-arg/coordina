@@ -14,7 +14,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { DataKanban } from "./data-kanban";
 import { useCallback } from "react";
-import { TaskStatus } from "../types";
+import { Task, TaskStatus } from "../types";
 import { useBulkUpdateTasks } from "../api/use-bulk-update-tasks";
 import { DataCalendar } from "./data-calendar";
 import { useProjectId } from "../../projects/hooks/use-project-id";
@@ -46,11 +46,13 @@ export const TaskViewSwitcher = ({
     dueDate,
   });
 
+  const taskRows = (tasks?.rows ?? []) as unknown as Task[];
+
   const onKanbanChange = useCallback(
     (tasks: { $id: string; status: TaskStatus; position: number }[]) => {
       bulkUpdate({ json: { tasks } });
     },
-    [bulkUpdate]
+    [bulkUpdate],
   );
 
   return (
@@ -96,13 +98,13 @@ export const TaskViewSwitcher = ({
         ) : (
           <>
             <TabsContent value="table" className="mt-0">
-              <DataTable columns={columns} data={tasks?.rows ?? []} />
+              <DataTable columns={columns} data={taskRows} />
             </TabsContent>
             <TabsContent value="kanban" className="mt-0">
-              <DataKanban onChange={onKanbanChange} data={tasks?.rows ?? []} />
+              <DataKanban onChange={onKanbanChange} data={taskRows} />
             </TabsContent>
             <TabsContent value="calendar" className="mt-0 h-full pb-4">
-              <DataCalendar data={tasks?.rows ?? []} />
+              <DataCalendar data={taskRows} />
             </TabsContent>
           </>
         )}

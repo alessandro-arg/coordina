@@ -5,6 +5,7 @@ import { useWorkspaceId } from "../../workspaces/hooks/use-workspace-id";
 import { LoaderCircle } from "lucide-react";
 import { useGetTask } from "../api/use-get-task";
 import { EditTaskForm } from "./edit-task-form";
+import { Task } from "../types";
 
 interface EditTaskFormWrapperProps {
   onCancel: () => void;
@@ -24,20 +25,23 @@ export const EditTaskFormWrapper = ({
   const { data: projects, isLoading: isLoadingProjects } = useGetProjects({
     workspaceId,
   });
+
   const { data: members, isLoading: isLoadingMembers } = useGetMembers({
     workspaceId,
   });
 
-  const projectOptions = projects?.rows.map((project) => ({
-    id: project.$id,
-    name: project.name,
-    imageUrl: project.imageUrl,
-  }));
+  const projectOptions =
+    projects?.rows.map((project) => ({
+      id: project.$id,
+      name: project.name ?? "Project",
+      imageUrl: project.imageUrl ?? undefined,
+    })) ?? [];
 
-  const memberOptions = members?.rows.map((member) => ({
-    id: member.$id,
-    name: member.name,
-  }));
+  const memberOptions =
+    members?.rows.map((member) => ({
+      id: member.$id,
+      name: member.name ?? "User",
+    })) ?? [];
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingTask;
 
@@ -53,13 +57,15 @@ export const EditTaskFormWrapper = ({
 
   if (!initialValues) return null;
 
+  const task = initialValues as unknown as Task;
+
   return (
     <div>
       <EditTaskForm
         onCancel={onCancel}
-        initialValues={initialValues}
-        projectOptions={projectOptions ?? []}
-        memberOptions={memberOptions ?? []}
+        initialValues={task}
+        projectOptions={projectOptions}
+        memberOptions={memberOptions}
       />
     </div>
   );

@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver, type SubmitHandler } from "react-hook-form";
 import { createTaskSchema, type CreateTaskValues } from "../schemas";
-import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
@@ -40,8 +39,6 @@ interface CreateTaskFormProps {
   }[];
   memberOptions: { id: string; name: string }[];
 }
-
-const createTaskFormSchema = createTaskSchema.omit({ workspaceId: true });
 
 export const CreateTaskForm = ({
   onCancel,

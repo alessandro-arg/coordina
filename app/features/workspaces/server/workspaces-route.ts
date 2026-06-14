@@ -8,12 +8,14 @@ import {
   MemberRole,
   WorkspaceModel,
   TaskModel,
+  ProjectModel,
 } from "@/lib/db/models";
 import { TaskStatus } from "../../tasks/types";
 import { getMember } from "../../members/utils";
 import { generateInviteCode } from "@/lib/utils";
 import { createWorkspaceSchema, updateWorkspaceSchema } from "../schemas";
 import { uploadImage } from "@/lib/cloudinary";
+import { z } from "zod";
 
 const serializeWorkspace = (workspace: {
   _id: unknown;
@@ -148,6 +150,110 @@ const app = new Hono()
       });
     },
   )
+
+  .get("/:workspaceId/info", sessionMiddleware, async (c) => {
+    const user = c.get("user");
+    const { workspaceId } = c.req.param();
+
+    await connectToDatabase();
+
+    const member = await getMember({
+      workspaceId,
+      userId: user.id,
+    });
+
+    if (!member) {
+      return c.json({ error: "Unauthorized" }, 403);
+    }
+
+    const workspace = await WorkspaceModel.findById(workspaceId).lean();
+
+    if (!workspace) {
+      return c.json({ error: "Workspace not found" }, 404);
+    }
+
+    return c.json({
+      data: {
+        $id: String(workspace._id),
+        name: workspace.name,
+        imageUrl: workspace.imageUrl,
+      },
+    });
+  })
+
+  .post(
+    "/:workspaceId/join",
+    sessionMiddleware,
+    zValidator("json", z.object({ inviteCode: z.string() })),
+    async (c) => {
+      const user = c.get("user");
+      const { workspaceId } = c.req.param();
+      const { inviteCode } = c.req.valid("json");
+
+      await connectToDatabase();
+
+      const existingMember = await getMember({
+        workspaceId,
+        userId: user.id,
+      });
+
+      if (existingMember) {
+        return c.json({ error: "Already a member" }, 400);
+      }
+
+      const workspace = await WorkspaceModel.findById(workspaceId).lean();
+
+      if (!workspace) {
+        return c.json({ error: "Workspace not found" }, 404);
+      }
+
+      if (workspace.inviteCode !== inviteCode) {
+        return c.json({ error: "Invalid invite code" }, 400);
+      }
+
+      await MemberModel.create({
+        workspaceId,
+        userId: user.id,
+        role: MemberRole.MEMBER,
+      });
+
+      return c.json({
+        data: serializeWorkspace(workspace),
+      });
+    },
+  )
+
+  .post("/:workspaceId/reset-invite-code", sessionMiddleware, async (c) => {
+    const user = c.get("user");
+    const { workspaceId } = c.req.param();
+
+    await connectToDatabase();
+
+    const member = await getMember({
+      workspaceId,
+      userId: user.id,
+    });
+
+    if (!member || member.role !== MemberRole.ADMIN) {
+      return c.json({ error: "Unauthorized" }, 403);
+    }
+
+    const workspace = await WorkspaceModel.findByIdAndUpdate(
+      workspaceId,
+      {
+        inviteCode: generateInviteCode(8),
+      },
+      { new: true },
+    ).lean();
+
+    if (!workspace) {
+      return c.json({ error: "Workspace not found" }, 404);
+    }
+
+    return c.json({
+      data: serializeWorkspace(workspace),
+    });
+  })
 
   .get("/:workspaceId", sessionMiddleware, async (c) => {
     const user = c.get("user");
@@ -305,6 +411,34 @@ const app = new Hono()
 
         overdueTaskCount: thisMonthOverdueTasks,
         overdueTaskDifference: thisMonthOverdueTasks - lastMonthOverdueTasks,
+      },
+    });
+  })
+
+  .delete("/:workspaceId", sessionMiddleware, async (c) => {
+    const user = c.get("user");
+    const { workspaceId } = c.req.param();
+
+    await connectToDatabase();
+
+    const member = await getMember({
+      workspaceId,
+      userId: user.id,
+    });
+
+    if (!member || member.role !== MemberRole.ADMIN) {
+      return c.json({ error: "Unauthorized" }, 403);
+    }
+
+    await WorkspaceModel.findByIdAndDelete(workspaceId);
+
+    await MemberModel.deleteMany({ workspaceId });
+    await ProjectModel.deleteMany({ workspaceId });
+    await TaskModel.deleteMany({ workspaceId });
+
+    return c.json({
+      data: {
+        $id: workspaceId,
       },
     });
   });

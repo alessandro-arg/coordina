@@ -6,7 +6,6 @@ import { useGetProjects } from "@/app/features/projects/api/use-get-projects";
 import { useCreateProjectModal } from "@/app/features/projects/hooks/use-create-project-modal";
 import { useGetTasks } from "@/app/features/tasks/api/use-get-tasks";
 import { useCreateTaskModal } from "@/app/features/tasks/hooks/use-create-task-modal";
-import { Task } from "@/app/features/tasks/types";
 import { useGetWorkspaceAnalytics } from "@/app/features/workspaces/api/use-get-workspace-analytics";
 import { useWorkspaceId } from "@/app/features/workspaces/hooks/use-workspace-id";
 import { Analytics } from "@/components/analytics";
@@ -17,10 +16,11 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Project } from "@/app/features/projects/types";
 import { ProjectAvatar } from "@/app/features/projects/components/project-avatar";
-import { Member } from "@/app/features/members/types";
 import { MemberAvatar } from "@/app/features/members/components/members-avatar";
+import { Task } from "@/app/features/tasks/types";
+import { Project } from "@/app/features/projects/types";
+import { Member } from "@/app/features/members/types";
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
@@ -51,13 +51,17 @@ export const WorkspaceIdClient = () => {
     return <PageError message="Failed to load workspace data" />;
   }
 
+  const taskRows = tasks.rows as unknown as Task[];
+  const projectRows = projects.rows as unknown as Project[];
+  const memberRows = members.rows as unknown as Member[];
+
   return (
     <div className="h-full flex flex-col space-y-4">
       <Analytics data={analytics} />
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <TaskList data={tasks.rows} total={tasks.total} />
-        <ProjectList data={projects.rows} total={projects.total} />
-        <MembersList data={members.rows} total={members.total} />
+        <TaskList data={taskRows} total={tasks.total} />
+        <ProjectList data={projectRows} total={projects.total} />
+        <MembersList data={memberRows} total={members.total} />
       </div>
     </div>
   );
@@ -143,7 +147,7 @@ export const ProjectList = ({ data, total }: ProjectListProps) => {
                   <CardContent className="p-4 flex items-center gap-x-2.5">
                     <ProjectAvatar
                       name={project.name}
-                      image={project.imageUrl}
+                      image={project.imageUrl ?? undefined}
                       className="size-12"
                       fallbackClassName="text-lg"
                     />
@@ -189,7 +193,10 @@ export const MembersList = ({ data, total }: MembersListProps) => {
             <li key={member.$id}>
               <Card className="dark:bg-card dark:border-border shadow-none rounded-lg overflow-hidden py-0">
                 <CardContent className="p-3 flex flex-col items-center gap-x-2">
-                  <MemberAvatar name={member.name} className="size-12" />
+                  <MemberAvatar
+                    name={member.name ?? "User"}
+                    className="size-12"
+                  />
                   <div className="flex flex-col items-center overflow-hidden">
                     <p className="text-lg font-medium line-clamp-1">
                       {member.name}
