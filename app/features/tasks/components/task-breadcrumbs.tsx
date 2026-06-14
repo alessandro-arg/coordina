@@ -22,7 +22,7 @@ export const TaskBreadcrumbs = ({ project, task }: TaskBreadcrumbsProps) => {
   const [ConfirmDialog, confirm] = useConfirm(
     "Delete task?",
     "This action cannot be undone.",
-    "destructive"
+    "destructive",
   );
 
   const handleDeleteTask = async () => {
@@ -35,7 +35,7 @@ export const TaskBreadcrumbs = ({ project, task }: TaskBreadcrumbsProps) => {
         onSuccess: () => {
           router.push(`/workspaces/${workspaceId}/tasks`);
         },
-      }
+      },
     );
   };
 
@@ -44,7 +44,7 @@ export const TaskBreadcrumbs = ({ project, task }: TaskBreadcrumbsProps) => {
       <ConfirmDialog />
       <ProjectAvatar
         name={project.name}
-        image={project.imageUrl}
+        image={project.imageUrl ?? undefined}
         className="size-6 lg:size-8"
       />
       <Link href={`/workspaces/${workspaceId}/projects/${project.$id}`}>

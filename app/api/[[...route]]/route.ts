@@ -1,16 +1,18 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 
-import auth from "../../features/auth/server/route";
-import members from "../../features/members/server/route";
-import projects from "../../features/projects/server/route";
-import tasks from "../../features/tasks/server/route";
-import workspaces from "../../features/workspaces/server/route";
+import account from "../../features/auth/server/account-route";
+import current from "../../features/auth/server/current-route";
+import members from "../../features/members/server/members-route";
+import projects from "../../features/projects/server/projects-route";
+import tasks from "../../features/tasks/server/tasks-route";
+import workspaces from "../../features/workspaces/server/workspaces-route";
 
 const app = new Hono().basePath("/api");
 
 const routes = app
-  .route("/auth", auth)
+  .route("/current", current)
+  .route("/account", account)
   .route("/workspaces", workspaces)
   .route("/members", members)
   .route("/projects", projects)

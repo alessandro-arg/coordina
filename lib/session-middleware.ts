@@ -1,60 +1,36 @@
 import "server-only";
 
-import {
-  Account,
-  Client,
-  Databases,
-  TablesDB,
-  Models,
-  Storage,
-  type Account as AccountType,
-  type Databases as DatabasesType,
-  type TablesDB as TablesDBType,
-  type Storage as StorageType,
-  type Users as UsersType,
-} from "node-appwrite";
-
-import { getCookie } from "hono/cookie";
+import { auth } from "@/auth";
 import { createMiddleware } from "hono/factory";
-import { AUTH_COOKIE } from "@/app/features/auth/constants";
+
+type AuthUser = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+};
 
 type AdditionalContext = {
   Variables: {
-    account: AccountType;
-    databases: DatabasesType;
-    tables: TablesDBType;
-    storage: StorageType;
-    users: UsersType;
-    user: Models.User<Models.Preferences>;
+    user: AuthUser;
   };
 };
 
 export const sessionMiddleware = createMiddleware<AdditionalContext>(
   async (c, next) => {
-    const client = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
+    const session = await auth();
 
-    const session = getCookie(c, AUTH_COOKIE);
-
-    if (!session) {
+    if (!session?.user?.id) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
-    client.setSession(session);
-
-    const account = new Account(client);
-    const databases = new Databases(client);
-    const tables = new TablesDB(client);
-    const storage = new Storage(client);
-    const user = await account.get();
-
-    c.set("account", account);
-    c.set("storage", storage);
-    c.set("databases", databases);
-    c.set("tables", tables);
-    c.set("user", user);
+    c.set("user", {
+      id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
+      image: session.user.image,
+    });
 
     await next();
-  }
+  },
 );

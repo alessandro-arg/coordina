@@ -1,7 +1,8 @@
-import { Models } from "node-appwrite";
-
-export type Project = Models.Row & {
+export type Project = {
+  $id: string;
   name: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
   workspaceId: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };

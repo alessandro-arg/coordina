@@ -20,16 +20,18 @@ export const CreateTaskFormWrapper = ({
     workspaceId,
   });
 
-  const projectOptions = projects?.rows.map((project) => ({
-    id: project.$id,
-    name: project.name,
-    imageUrl: project.imageUrl,
-  }));
+  const projectOptions =
+    projects?.rows.map((project) => ({
+      id: project.$id,
+      name: project.name ?? "Project",
+      imageUrl: project.imageUrl ?? undefined,
+    })) ?? [];
 
-  const memberOptions = members?.rows.map((member) => ({
-    id: member.$id,
-    name: member.name,
-  }));
+  const memberOptions =
+    members?.rows.map((member) => ({
+      id: member.$id,
+      name: member.name ?? "User",
+    })) ?? [];
 
   const isLoading = isLoadingMembers || isLoadingProjects;
 
@@ -47,8 +49,8 @@ export const CreateTaskFormWrapper = ({
     <div>
       <CreateTaskForm
         onCancel={onCancel}
-        projectOptions={projectOptions ?? []}
-        memberOptions={memberOptions ?? []}
+        projectOptions={projectOptions}
+        memberOptions={memberOptions}
       />
     </div>
   );

@@ -37,10 +37,13 @@ export const Projects = () => {
             <div
               className={cn(
                 "flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer",
-                isActive && "bg-muted shadow-sm hover:opacity-100 text-primary"
+                isActive && "bg-muted shadow-sm hover:opacity-100 text-primary",
               )}
             >
-              <ProjectAvatar image={project.imageUrl} name={project.name} />
+              <ProjectAvatar
+                image={project.imageUrl ?? undefined}
+                name={project.name ?? "Project"}
+              />
               <span className="truncate">{project.name}</span>
             </div>
           </Link>

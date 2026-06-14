@@ -1,11 +1,10 @@
-import { getCurrent } from "@/app/features/auth/queries";
 import { redirect } from "next/navigation";
 import { WorkspaceIdSettingsClient } from "./client";
+import { auth } from "@/auth";
 
 const WorkspaceIdSettingsPage = async () => {
-  const user = await getCurrent();
-
-  if (!user) redirect("/sign-in");
+  const session = await auth();
+  if (!session?.user) redirect("/sign-in");
 
   return <WorkspaceIdSettingsClient />;
 };

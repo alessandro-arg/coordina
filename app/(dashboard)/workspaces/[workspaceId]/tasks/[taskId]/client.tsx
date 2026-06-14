@@ -10,6 +10,7 @@ import { Project } from "@/app/features/projects/types";
 import DottedSeparator from "@/components/dotted-separator";
 import { TaskOverview } from "@/app/features/tasks/components/task-overview";
 import { TaskDescription } from "@/app/features/tasks/components/task-description";
+import { Member } from "@/app/features/members/types";
 
 export const TaskIdClient = () => {
   const taskId = useTaskId();
@@ -23,7 +24,10 @@ export const TaskIdClient = () => {
     return <PageError message="Task not found" />;
   }
 
-  const task = data as Task & { project?: Project };
+  const task = data as unknown as Task & {
+    project?: Project;
+    assignee?: Partial<Member>;
+  };
 
   if (!task.project) {
     return <PageError message="Project not found for this task" />;

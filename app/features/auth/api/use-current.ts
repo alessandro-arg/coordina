@@ -5,7 +5,7 @@ export const useCurrent = () => {
   const query = useQuery({
     queryKey: ["current"],
     queryFn: async () => {
-      const response = await client.api.auth.current.$get();
+      const response = await client.api.current.$get();
 
       if (!response.ok) {
         return null;

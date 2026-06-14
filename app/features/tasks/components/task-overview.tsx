@@ -43,7 +43,10 @@ export const TaskOverview = ({ task }: TaskOverviewProps) => {
             <p className="text-sm font-medium">{task.assignee!.name}</p>
           </OverviewProperty>
           <OverviewProperty label="Due date">
-            <TaskDate value={task.dueDate} className="text-sm font-medium" />
+            <TaskDate
+              value={new Date(task.dueDate).toISOString()}
+              className="text-sm font-medium"
+            />
           </OverviewProperty>
           <OverviewProperty label="Status">
             <Badge variant={task.status}>

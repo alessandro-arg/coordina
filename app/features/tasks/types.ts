@@ -1,4 +1,3 @@
-import { Models } from "node-appwrite";
 import { Member } from "../members/types";
 import { Project } from "../projects/types";
 
@@ -10,15 +9,18 @@ export enum TaskStatus {
   DONE = "DONE",
 }
 
-export type Task = Models.Row & {
+export type Task = {
+  $id: string;
   name: string;
   status: TaskStatus;
   workspaceId: string;
   assigneeId: string;
   projectId: string;
   position: number;
-  dueDate: string;
+  dueDate: string | Date;
   description: string | null;
   assignee?: Partial<Member>;
   project?: Partial<Project>;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };
