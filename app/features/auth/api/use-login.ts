@@ -1,33 +1,38 @@
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { InferRequestType, InferResponseType } from "hono";
-import { client } from "@/lib/rpc";
+import { useMutation } from "@tanstack/react-query";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-type ResponseType = InferResponseType<(typeof client.api.auth.login)["$post"]>;
-type RequestType = InferRequestType<(typeof client.api.auth.login)["$post"]>;
+type LoginValues = {
+  email: string;
+  password: string;
+};
 
 export const useLogin = () => {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth.login["$post"]({ json });
+  const mutation = useMutation({
+    mutationFn: async (values: LoginValues) => {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
 
-      if (!response.ok) {
-        throw new Error("Failed to login");
+      if (!result || result.error) {
+        console.log("LOGIN RESULT:", result);
+        throw new Error(result?.error ?? "Invalid email or password");
       }
 
-      return response.json();
+      return result;
     },
     onSuccess: () => {
-      toast.success("Logged in correctly");
+      toast.success("Logged in successfully");
+      router.push("/");
       router.refresh();
-      queryClient.invalidateQueries({ queryKey: ["current"] });
     },
     onError: () => {
-      toast.error("Failed to log in");
+      toast.error("Invalid email or password");
     },
   });
 

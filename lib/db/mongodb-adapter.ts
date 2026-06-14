@@ -17,7 +17,6 @@ const options = {
 let client: MongoClient;
 
 declare global {
-  // eslint-disable-next-line no-var
   var _mongoClient: MongoClient | undefined;
 }
 

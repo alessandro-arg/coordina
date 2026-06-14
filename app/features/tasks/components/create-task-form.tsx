@@ -43,8 +43,6 @@ interface CreateTaskFormProps {
 
 const createTaskFormSchema = createTaskSchema.omit({ workspaceId: true });
 
-type CreateTaskFormValues = z.infer<typeof createTaskFormSchema>;
-
 export const CreateTaskForm = ({
   onCancel,
   projectOptions,
@@ -70,7 +68,7 @@ export const CreateTaskForm = ({
           form.reset();
           onCancel?.();
         },
-      }
+      },
     );
   };
 

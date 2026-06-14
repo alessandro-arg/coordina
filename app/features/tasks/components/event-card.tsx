@@ -5,7 +5,6 @@ import { MemberAvatar } from "../../members/components/members-avatar";
 import { ProjectAvatar } from "../../projects/components/project-avatar";
 import { useWorkspaceId } from "../../workspaces/hooks/use-workspace-id";
 import { useRouter } from "next/navigation";
-import { Member } from "../../members/types";
 
 interface EventCardProps {
   title: string;
@@ -49,7 +48,7 @@ export const EventCard = ({
         onClick={onClick}
         className={cn(
           "p-1.5 text-xs bg-card text-primary border rounded-md border-l-4 flex flex-col gap-y-1.5 cursor-pointer hover:opacity-75 transition",
-          statusColorMap[status]
+          statusColorMap[status],
         )}
       >
         <p>{title}</p>
