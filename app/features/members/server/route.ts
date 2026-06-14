@@ -1,13 +1,21 @@
-import { createAdminClient } from "@/lib/appwrite";
-import { sessionMiddleware } from "@/lib/session-middleware";
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
+
+import { sessionMiddleware } from "@/lib/session-middleware";
+import { connectToDatabase } from "@/lib/db/connect";
+import { MemberModel, MemberRole } from "@/lib/db/models";
 import { getMember } from "../utils";
-import { DATABASE_ID, MEMBERS_ID } from "@/config";
-import { Query } from "node-appwrite";
-import { Member, MemberRole } from "../types";
-import { handle } from "hono/vercel";
+
+const serializeMember = (member: {
+  _id: unknown;
+  userId: string;
+  workspaceId: string;
+  role: string;
+}) => ({
+  ...member,
+  $id: String(member._id),
+});
 
 const app = new Hono()
   .get(
@@ -15,151 +23,137 @@ const app = new Hono()
     sessionMiddleware,
     zValidator("query", z.object({ workspaceId: z.string() })),
     async (c) => {
-      const { users } = await createAdminClient();
-      const tables = c.get("tables");
       const user = c.get("user");
-
       const { workspaceId } = c.req.valid("query");
 
-      const member = await getMember({
-        tables,
+      await connectToDatabase();
+
+      const currentMember = await getMember({
         workspaceId,
-        userId: user.$id,
+        userId: user.id,
       });
 
-      if (!member) {
+      if (!currentMember) {
         return c.json(
           { error: "You are not a member of this workspace." },
-          403
+          403,
         );
       }
 
-      const members = await tables.listRows<Member>({
-        databaseId: DATABASE_ID,
-        tableId: MEMBERS_ID,
-        queries: [Query.equal("workspaceId", workspaceId)],
-      });
+      const members = await MemberModel.find({ workspaceId }).lean();
 
-      const populatedMembers = await Promise.all(
-        members.rows.map(async (member) => {
-          const user = await users.get(member.userId);
-          return {
-            ...member,
-            name: user.name,
-            email: user.email,
-          };
-        })
+      const populatedMembers = members.map((member) =>
+        serializeMember({
+          ...member,
+          name: member.userId === user.id ? (user.name ?? "") : "",
+          email: member.userId === user.id ? (user.email ?? "") : "",
+        } as any),
       );
 
-      return c.json({ data: { ...members, rows: populatedMembers } });
-    }
+      return c.json({
+        data: {
+          rows: populatedMembers,
+          total: populatedMembers.length,
+        },
+      });
+    },
   )
+
   .delete("/:memberId", sessionMiddleware, async (c) => {
-    const { memberId } = c.req.param();
-    const tables = c.get("tables");
     const user = c.get("user");
+    const { memberId } = c.req.param();
 
-    const memberToDelete = await tables.getRow({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_ID,
-      rowId: memberId,
-    });
+    await connectToDatabase();
 
-    const allMembersInWorkspace = await tables.listRows({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_ID,
-      queries: [Query.equal("workspaceId", memberToDelete.workspaceId)],
-    });
+    const memberToDelete = await MemberModel.findById(memberId).lean();
 
-    const member = await getMember({
-      tables,
+    if (!memberToDelete) {
+      return c.json({ error: "Member not found" }, 404);
+    }
+
+    const allMembersInWorkspace = await MemberModel.find({
       workspaceId: memberToDelete.workspaceId,
-      userId: user.$id,
+    }).lean();
+
+    const currentMember = await getMember({
+      workspaceId: memberToDelete.workspaceId,
+      userId: user.id,
     });
 
-    if (!member)
+    if (!currentMember) {
       return c.json({ error: "You are not a member of this workspace." }, 403);
+    }
 
-    if (member.$id !== memberToDelete.$id && member.role !== MemberRole.ADMIN) {
+    if (
+      String(currentMember._id) !== String(memberToDelete._id) &&
+      currentMember.role !== MemberRole.ADMIN
+    ) {
       return c.json(
         { error: "You don't have permission to remove this member." },
-        403
+        403,
       );
     }
 
-    if (allMembersInWorkspace.total === 1) {
+    if (allMembersInWorkspace.length === 1) {
       return c.json(
         { error: "You cannot remove the last member of the workspace." },
-        400
+        400,
       );
     }
 
-    await tables.deleteRow({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_ID,
-      rowId: memberId,
-    });
+    await MemberModel.findByIdAndDelete(memberId);
 
-    return c.json({ data: { $id: memberToDelete.$id } });
+    return c.json({ data: { $id: memberId } });
   })
+
   .patch(
     "/:memberId",
     sessionMiddleware,
     zValidator("json", z.object({ role: z.enum(MemberRole) })),
     async (c) => {
+      const user = c.get("user");
       const { memberId } = c.req.param();
       const { role } = c.req.valid("json");
-      const tables = c.get("tables");
-      const user = c.get("user");
 
-      const memberToUpdate = await tables.getRow({
-        databaseId: DATABASE_ID,
-        tableId: MEMBERS_ID,
-        rowId: memberId,
-      });
+      await connectToDatabase();
 
-      const allMembersInWorkspace = await tables.listRows({
-        databaseId: DATABASE_ID,
-        tableId: MEMBERS_ID,
-        queries: [Query.equal("workspaceId", memberToUpdate.workspaceId)],
-      });
+      const memberToUpdate = await MemberModel.findById(memberId).lean();
 
-      const member = await getMember({
-        tables,
+      if (!memberToUpdate) {
+        return c.json({ error: "Member not found" }, 404);
+      }
+
+      const allMembersInWorkspace = await MemberModel.find({
         workspaceId: memberToUpdate.workspaceId,
-        userId: user.$id,
+      }).lean();
+
+      const currentMember = await getMember({
+        workspaceId: memberToUpdate.workspaceId,
+        userId: user.id,
       });
 
-      if (!member)
+      if (!currentMember) {
         return c.json(
           { error: "You are not a member of this workspace." },
-          403
+          403,
         );
+      }
 
-      if (member.role !== MemberRole.ADMIN) {
+      if (currentMember.role !== MemberRole.ADMIN) {
         return c.json(
-          { error: "You don't have permission to remove this member." },
-          403
+          { error: "You don't have permission to update this member." },
+          403,
         );
       }
 
-      if (allMembersInWorkspace.total === 1) {
-        return c.json({ error: "You cannot downgrade the last member" }, 400);
+      if (allMembersInWorkspace.length === 1 && role !== MemberRole.ADMIN) {
+        return c.json({ error: "You cannot downgrade the last admin" }, 400);
       }
 
-      await tables.updateRow({
-        databaseId: DATABASE_ID,
-        tableId: MEMBERS_ID,
-        rowId: memberId,
-        data: { role },
-      });
+      await MemberModel.findByIdAndUpdate(memberId, { role });
 
-      return c.json({ data: { $id: memberToUpdate.$id } });
-    }
+      return c.json({ data: { $id: memberId } });
+    },
   );
 
 export default app;
-export const GET = handle(app);
-export const POST = handle(app);
-export const PATCH = handle(app);
-export const DELETE = handle(app);
