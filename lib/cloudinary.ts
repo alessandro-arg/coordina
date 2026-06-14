@@ -18,8 +18,13 @@ export async function uploadImage(file: File, folder: string) {
           resource_type: "image",
         },
         (error, result) => {
-          if (error || !result) {
+          if (error) {
             reject(error);
+            return;
+          }
+
+          if (!result?.secure_url) {
+            reject(new Error("Cloudinary upload failed without a secure URL"));
             return;
           }
 

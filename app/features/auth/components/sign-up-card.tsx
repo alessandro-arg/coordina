@@ -141,7 +141,7 @@ export default function SignUpCard() {
             className="w-full"
           >
             <FcGoogle className="mr-2 size-5" />
-            Login with Google
+            Continue with Google
           </Button>
         </form>
         <form action={signInWithGithub}>
@@ -153,7 +153,7 @@ export default function SignUpCard() {
             className="w-full"
           >
             <FaGithub className="mr-2 size-5" />
-            Login with GitHub
+            Continue with GitHub
           </Button>
         </form>
       </CardContent>

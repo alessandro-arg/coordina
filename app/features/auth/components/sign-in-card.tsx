@@ -6,13 +6,7 @@ import { FaGithub } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DottedSeparator from "@/components/dotted-separator";
 import { Input } from "@/components/ui/input";
 import {
@@ -46,10 +40,10 @@ export default function SignInCard() {
     <Card className="w-full h-full md:w-[487px] border-none shadow-none">
       <CardHeader className="flex flex-col items-center justify-center text-center p-7">
         <CardTitle className="text-2xl">Welcome back!</CardTitle>
-        <CardDescription>
+        {/* <CardDescription>
           If you want to test the app, click{" "}
           <Button variant="transparent">here</Button>.
-        </CardDescription>
+        </CardDescription> */}
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />
@@ -113,7 +107,7 @@ export default function SignInCard() {
             className="w-full"
           >
             <FcGoogle className="mr-2 size-5" />
-            Login with Google
+            Continue with Google
           </Button>
         </form>
         <form action={signInWithGithub}>
@@ -125,7 +119,7 @@ export default function SignInCard() {
             className="w-full"
           >
             <FaGithub className="mr-2 size-5" />
-            Login with GitHub
+            Continue with GitHub
           </Button>
         </form>
       </CardContent>
