@@ -12,7 +12,8 @@ import {
 import { TaskStatus } from "../../tasks/types";
 import { getMember } from "../../members/utils";
 import { generateInviteCode } from "@/lib/utils";
-import { createWorkspaceSchema } from "../schemas";
+import { createWorkspaceSchema, updateWorkspaceSchema } from "../schemas";
+import { uploadImage } from "@/lib/cloudinary";
 
 const serializeWorkspace = (workspace: {
   _id: unknown;
@@ -66,13 +67,21 @@ const app = new Hono()
     zValidator("form", createWorkspaceSchema),
     async (c) => {
       const user = c.get("user");
-      const { name } = c.req.valid("form");
+      const { name, image } = c.req.valid("form");
 
       await connectToDatabase();
 
+      let imageUrl: string | null = null;
+
+      if (image instanceof File) {
+        imageUrl = await uploadImage(image, "coordina/workspaces");
+      } else if (typeof image === "string" && image.length > 0) {
+        imageUrl = image;
+      }
+
       const workspace = await WorkspaceModel.create({
         name,
-        imageUrl: null,
+        imageUrl,
         inviteCode: generateInviteCode(8),
         userId: user.id,
       });
@@ -85,6 +94,57 @@ const app = new Hono()
 
       return c.json({
         data: serializeWorkspace(workspace.toObject()),
+      });
+    },
+  )
+
+  .patch(
+    "/:workspaceId",
+    sessionMiddleware,
+    zValidator("form", updateWorkspaceSchema),
+    async (c) => {
+      const user = c.get("user");
+      const { workspaceId } = c.req.param();
+      const { name, image } = c.req.valid("form");
+
+      await connectToDatabase();
+
+      const member = await getMember({
+        workspaceId,
+        userId: user.id,
+      });
+
+      if (!member || member.role !== MemberRole.ADMIN) {
+        return c.json({ error: "Unauthorized" }, 403);
+      }
+
+      const updateData: {
+        name?: string;
+        imageUrl?: string | null;
+      } = {};
+
+      if (name !== undefined) {
+        updateData.name = name;
+      }
+
+      if (image instanceof File) {
+        updateData.imageUrl = await uploadImage(image, "coordina/workspaces");
+      } else if (typeof image === "string") {
+        updateData.imageUrl = image.length > 0 ? image : null;
+      }
+
+      const workspace = await WorkspaceModel.findByIdAndUpdate(
+        workspaceId,
+        updateData,
+        { new: true },
+      ).lean();
+
+      if (!workspace) {
+        return c.json({ error: "Workspace not found" }, 404);
+      }
+
+      return c.json({
+        data: serializeWorkspace(workspace),
       });
     },
   )

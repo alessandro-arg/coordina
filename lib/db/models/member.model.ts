@@ -30,7 +30,6 @@ const memberSchema = new Schema(
 );
 
 memberSchema.index({ workspaceId: 1, userId: 1 }, { unique: true });
-memberSchema.index({ userId: 1 });
 
 export type MemberDocument = InferSchemaType<typeof memberSchema>;
 
