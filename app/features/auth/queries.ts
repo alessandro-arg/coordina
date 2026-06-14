@@ -1,11 +1,7 @@
-import { createSessionClient } from "@/lib/appwrite";
+import { auth } from "@/auth";
 
 export const getCurrent = async () => {
-  try {
-    const { account } = await createSessionClient();
+  const session = await auth();
 
-    return await account.get();
-  } catch {
-    return null;
-  }
+  return session?.user ?? null;
 };

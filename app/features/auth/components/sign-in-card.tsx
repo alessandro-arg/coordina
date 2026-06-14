@@ -25,7 +25,7 @@ import {
 import Link from "next/link";
 import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
-import { signUpWithGithub, signUpWithGoogle } from "@/lib/server/oauth";
+import { signInWithGithub, signInWithGoogle } from "@/lib/server/oauth";
 
 export default function SignInCard() {
   const { mutate, isPending } = useLogin();
@@ -104,7 +104,7 @@ export default function SignInCard() {
         <DottedSeparator />
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
-        <form action={signUpWithGoogle}>
+        <form action={signInWithGoogle}>
           <Button
             type="submit"
             disabled={isPending}
@@ -116,7 +116,7 @@ export default function SignInCard() {
             Login with Google
           </Button>
         </form>
-        <form action={signUpWithGithub}>
+        <form action={signInWithGithub}>
           <Button
             type="submit"
             disabled={isPending}

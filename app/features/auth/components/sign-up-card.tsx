@@ -26,7 +26,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { registerSchema } from "../schemas";
 import { useRegister } from "../api/use-register";
-import { signUpWithGithub, signUpWithGoogle } from "@/lib/server/oauth";
+import { signInWithGithub, signInWithGoogle } from "@/lib/server/oauth";
 
 export default function SignUpCard() {
   const { mutate, isPending } = useRegister();
@@ -133,7 +133,7 @@ export default function SignUpCard() {
         <DottedSeparator />
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
-        <form action={signUpWithGoogle}>
+        <form action={signInWithGoogle}>
           <Button
             type="submit"
             disabled={isPending}
@@ -145,7 +145,7 @@ export default function SignUpCard() {
             Login with Google
           </Button>
         </form>
-        <form action={signUpWithGithub}>
+        <form action={signInWithGithub}>
           <Button
             type="submit"
             disabled={isPending}
