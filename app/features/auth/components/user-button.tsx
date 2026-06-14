@@ -31,7 +31,7 @@ export const UserButton = () => {
   const { name, email } = user;
   const avatarFallback = name
     ? name.charAt(0).toUpperCase()
-    : email.charAt(0).toUpperCase() ?? "U";
+    : (email.charAt(0).toUpperCase() ?? "U");
 
   return (
     <DropdownMenu modal={false}>
@@ -61,7 +61,10 @@ export const UserButton = () => {
         </div>
         <DottedSeparator className="mb-1 px-4" />
         <DropdownMenuItem
-          onClick={() => logout()}
+          onSelect={(e) => {
+            e.preventDefault();
+            logout();
+          }}
           className="h-10 flex items-center justify-center text-amber-700 dark:text-red-400 font-medium cursor-pointer"
         >
           <LogOut className="size-4 mr-2" />
