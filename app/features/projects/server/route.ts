@@ -8,6 +8,7 @@ import { ProjectModel, TaskModel } from "@/lib/db/models";
 import { getMember } from "../../members/utils";
 import { createProjectSchema, updateProjectSchema } from "../schemas";
 import { TaskStatus } from "../../tasks/types";
+import { uploadImage } from "@/lib/cloudinary";
 
 const serializeProject = (project: {
   _id: unknown;
@@ -86,9 +87,17 @@ const app = new Hono()
     zValidator("form", createProjectSchema),
     async (c) => {
       const user = c.get("user");
-      const { name, workspaceId } = c.req.valid("form");
+      const { name, workspaceId, image } = c.req.valid("form");
 
       await connectToDatabase();
+
+      let imageUrl: string | null = null;
+
+      if (image instanceof File) {
+        imageUrl = await uploadImage(image, "coordina/projects");
+      } else if (typeof image === "string" && image.length > 0) {
+        imageUrl = image;
+      }
 
       const member = await getMember({
         workspaceId,
@@ -102,7 +111,7 @@ const app = new Hono()
       const project = await ProjectModel.create({
         name,
         workspaceId,
-        imageUrl: null,
+        imageUrl,
       });
 
       return c.json({
@@ -118,9 +127,24 @@ const app = new Hono()
     async (c) => {
       const user = c.get("user");
       const { projectId } = c.req.param();
-      const { name } = c.req.valid("form");
+      const { name, image } = c.req.valid("form");
 
       await connectToDatabase();
+
+      const updateData: {
+        name?: string;
+        imageUrl?: string | null;
+      } = {};
+
+      if (name !== undefined) {
+        updateData.name = name;
+      }
+
+      if (image instanceof File) {
+        updateData.imageUrl = await uploadImage(image, "coordina/projects");
+      } else if (typeof image === "string") {
+        updateData.imageUrl = image.length > 0 ? image : null;
+      }
 
       const existingProject = await ProjectModel.findById(projectId).lean();
 
@@ -139,9 +163,7 @@ const app = new Hono()
 
       const project = await ProjectModel.findByIdAndUpdate(
         projectId,
-        {
-          name,
-        },
+        updateData,
         { new: true },
       ).lean();
 
