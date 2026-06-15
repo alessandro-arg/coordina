@@ -55,7 +55,9 @@ export const UserButton = () => {
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-center justify-center">
-            <p className="text-sm font-medium text-primary">{name || "User"}</p>
+            <p className="text-sm font-medium text-foreground">
+              {name || "User"}
+            </p>
             <p className="text-xs text-muted-foreground">{email || "Email"}</p>
           </div>
         </div>
@@ -65,7 +67,7 @@ export const UserButton = () => {
             e.preventDefault();
             logout();
           }}
-          className="h-10 flex items-center justify-center text-amber-700 dark:text-red-400 font-medium cursor-pointer"
+          className="h-10 flex items-center justify-center text-destructive hover:text-destructive/80 font-medium cursor-pointer"
         >
           <LogOut className="size-4 mr-2" />
           Log out
