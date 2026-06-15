@@ -26,6 +26,27 @@ import Link from "next/link";
 import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
 import { signInWithGithub, signInWithGoogle } from "@/lib/server/oauth";
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
+
+const DEMO_WORKSPACE_ID = "demo-workspace-1";
+
+const handleDemoLogin = async () => {
+  const result = await signIn("credentials", {
+    email: "demo@coordina.app",
+    password: "irgendwas-langes",
+    redirect: false,
+  });
+
+  if (result?.error) {
+    toast.error("Demo login failed");
+    return;
+  }
+
+  toast.success("Logged in as Demo User");
+
+  window.location.href = `/workspaces/${DEMO_WORKSPACE_ID}`;
+};
 
 export default function SignInCard() {
   const { mutate, isPending } = useLogin();
@@ -48,14 +69,14 @@ export default function SignInCard() {
         <CardTitle className="text-2xl font-semibold tracking-tight">
           Welcome back
         </CardTitle>
-        <CardDescription className="text-muted-foreground text-sm mt-1">
-          Enter your credentials to access your account
-        </CardDescription>
 
-        {/* <CardDescription>
+        <CardDescription className="text-muted-foreground text-sm mt-1">
           If you want to test the app, click{" "}
-          <Button variant="transparent">here</Button>.
-        </CardDescription> */}
+          <Button type="button" variant="transparent" onClick={handleDemoLogin}>
+            here
+          </Button>
+          .
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="p-7 pt-2 space-y-6">
