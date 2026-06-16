@@ -26,6 +26,8 @@ import { Project } from "../types";
 import { useUpdateProject } from "../api/use-update-project";
 import { useDeleteProject } from "../api/use-delete-project";
 import { useConfirm } from "@/hooks/use-confirm";
+import { useCurrent } from "../../auth/api/use-current";
+import { toast } from "sonner";
 
 interface EditProjectFormProps {
   onCancel?: () => void;
@@ -40,6 +42,8 @@ export const EditProjectForm = ({
   const { mutate, isPending } = useUpdateProject();
   const { mutate: deleteProject, isPending: isDeletingProject } =
     useDeleteProject();
+  const { data: currentUser } = useCurrent();
+  const isDemo = currentUser?.isDemo;
 
   const [DeleteDialog, confirmDelete] = useConfirm(
     "Delete Project",
@@ -171,7 +175,7 @@ export const EditProjectForm = ({
                             accept=".jpg, .png, .jpeg, .svg"
                             ref={inputRef}
                             onChange={handleImageChange}
-                            disabled={isPending || isDeletingProject}
+                            disabled={isPending || isDeletingProject || isDemo}
                           />
                           {field.value ? (
                             <Button
@@ -180,12 +184,21 @@ export const EditProjectForm = ({
                               variant="destructive"
                               className="w-fit mt-2"
                               onClick={() => {
+                                if (isDemo) {
+                                  toast.info(
+                                    "Image upload is not available with demo user",
+                                  );
+                                  return;
+                                }
+
                                 field.onChange("");
                                 if (inputRef.current) {
                                   inputRef.current.value = "";
                                 }
                               }}
-                              disabled={isPending || isDeletingProject}
+                              disabled={
+                                isPending || isDeletingProject || isDemo
+                              }
                             >
                               Remove image
                             </Button>
@@ -196,10 +209,17 @@ export const EditProjectForm = ({
                               variant="teritary"
                               className="w-fit mt-2"
                               onClick={() => inputRef.current?.click()}
-                              disabled={isPending || isDeletingProject}
+                              disabled={
+                                isPending || isDeletingProject || isDemo
+                              }
                             >
                               Upload image
                             </Button>
+                          )}
+                          {isDemo && (
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              *image upload is not available with demo user
+                            </p>
                           )}
                         </div>
                       </div>

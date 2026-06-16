@@ -21,9 +21,24 @@ import { MemberAvatar } from "@/app/features/members/components/members-avatar";
 import { Task } from "@/app/features/tasks/types";
 import { Project } from "@/app/features/projects/types";
 import { Member } from "@/app/features/members/types";
+import { useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("demo") === "true") {
+      toast.info(
+        "Demo mode enabled. All changes are stored locally and won't affect other users.",
+      );
+
+      router.replace(`/workspaces/${workspaceId}`);
+    }
+  }, [searchParams, router, workspaceId]);
 
   const { data: analytics, isLoading: isLoadingAnalytics } =
     useGetWorkspaceAnalytics({ workspaceId });
@@ -57,6 +72,12 @@ export const WorkspaceIdClient = () => {
 
   return (
     <div className="h-full flex flex-col space-y-4">
+      <div className="rounded-lg border bg-muted p-4">
+        <p className="font-medium">Demo Mode</p>
+        <p className="text-sm text-muted-foreground">
+          Changes are stored locally and won't affect other users.
+        </p>
+      </div>
       <Analytics data={analytics} />
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <TaskList data={taskRows} total={tasks.total} />

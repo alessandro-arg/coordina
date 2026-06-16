@@ -45,7 +45,7 @@ const handleDemoLogin = async () => {
 
   toast.success("Logged in as Demo User");
 
-  window.location.href = `/workspaces/${DEMO_WORKSPACE_ID}`;
+  window.location.href = `/workspaces/${DEMO_WORKSPACE_ID}?demo=true`;
 };
 
 export default function SignInCard() {
@@ -70,13 +70,22 @@ export default function SignInCard() {
           Welcome back
         </CardTitle>
 
-        <CardDescription className="text-muted-foreground text-sm mt-1">
-          If you want to test the app, click{" "}
-          <Button type="button" variant="transparent" onClick={handleDemoLogin}>
-            here
+        <div className="mt-4 rounded-lg border border-primary/60 p-4">
+          <p className="font-medium">Want to test the application?</p>
+
+          <p className="text-sm text-muted-foreground mt-1">
+            Use the demo workspace and explore all features instantly. No
+            account required.
+          </p>
+
+          <Button
+            type="button"
+            className="mt-3 w-full"
+            onClick={handleDemoLogin}
+          >
+            Open Demo Workspace
           </Button>
-          .
-        </CardDescription>
+        </div>
       </CardHeader>
 
       <CardContent className="p-7 pt-2 space-y-6">

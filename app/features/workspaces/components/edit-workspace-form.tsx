@@ -212,7 +212,7 @@ export const EditWorkspaceForm = ({
                             accept=".jpg, .png, .jpeg, .svg"
                             ref={inputRef}
                             onChange={handleImageChange}
-                            disabled={isPending}
+                            disabled={isPending || isDemo}
                           />
                           {field.value ? (
                             <Button
@@ -226,7 +226,7 @@ export const EditWorkspaceForm = ({
                                   inputRef.current.value = "";
                                 }
                               }}
-                              disabled={isPending}
+                              disabled={isPending || isDemo}
                             >
                               Remove image
                             </Button>
@@ -236,11 +236,24 @@ export const EditWorkspaceForm = ({
                               size="xs"
                               variant="teritary"
                               className="w-fit mt-2"
-                              onClick={() => inputRef.current?.click()}
-                              disabled={isPending}
+                              onClick={() => {
+                                if (isDemo) {
+                                  toast.info(
+                                    "Image upload is not available with demo user",
+                                  );
+                                  return;
+                                }
+                                inputRef.current?.click();
+                              }}
+                              disabled={isPending || isDemo}
                             >
                               Upload image
                             </Button>
+                          )}
+                          {isDemo && (
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              *image upload is not available with demo user
+                            </p>
                           )}
                         </div>
                       </div>

@@ -50,7 +50,7 @@ export const defaultDemoData: DemoData = {
     {
       $id: "demo-workspace-1",
       name: "Demo Workspace",
-      imageUrl: null,
+      imageUrl: "/demo/workspace.png",
       inviteCode: "DEMO2026",
       userId: "6a3058e1c43b19767960b825",
     },
@@ -85,13 +85,13 @@ export const defaultDemoData: DemoData = {
     {
       $id: "demo-project-1",
       name: "Website Relaunch",
-      imageUrl: null,
+      imageUrl: "/demo/website.png",
       workspaceId: "demo-workspace-1",
     },
     {
       $id: "demo-project-2",
       name: "Mobile App",
-      imageUrl: null,
+      imageUrl: "/demo/mobile.png",
       workspaceId: "demo-workspace-1",
     },
   ],
