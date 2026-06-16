@@ -30,6 +30,10 @@ export const useUpdateMember = () => {
           throw new Error("Demo member not found");
         }
 
+        if (param.memberId === "demo-member-1") {
+          throw new Error("Demo user cannot be changed");
+        }
+
         demoData.members[memberIndex] = {
           ...demoData.members[memberIndex],
           role: json.role,
