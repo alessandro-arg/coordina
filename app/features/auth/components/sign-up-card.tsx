@@ -18,6 +18,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
@@ -44,29 +45,59 @@ export default function SignUpCard() {
   };
 
   return (
-    <Card className="w-full h-full md:w-[487px] border-none shadow-none">
-      <CardHeader className="flex flex-col items-center justify-center text-center p-7">
-        <CardTitle className="text-2xl">Sign Up</CardTitle>
-        <CardDescription>
-          By signing up, you agree to our
-          <br />
-          <Link href="/privacy">
-            <span className="text-blue-700 dark:text-blue-500">
-              Privacy Policy
-            </span>
-          </Link>{" "}
-          and{" "}
-          <Link href="/terms">
-            <span className="text-blue-700 dark:text-blue-500">
-              Terms of Service
-            </span>
-          </Link>
+    <Card className="w-full h-full md:w-[487px] border border-border shadow-lg">
+      <CardHeader className="flex flex-col items-start justify-start text-left p-7 pb-0">
+        <CardTitle className="text-2xl font-semibold tracking-tight">
+          Create an account
+        </CardTitle>
+
+        <CardDescription className="text-muted-foreground text-sm mt-1">
+          Enter your email below to create your account
         </CardDescription>
       </CardHeader>
-      <div className="px-7">
-        <DottedSeparator />
-      </div>
-      <CardContent className="p-7">
+
+      <CardContent className="p-7 pt-2 space-y-6">
+        {/* OAuth buttons side by side */}
+        <div className="grid grid-cols-2 gap-3">
+          <form action={signInWithGithub}>
+            <Button
+              type="submit"
+              disabled={isPending}
+              variant="outline"
+              size="lg"
+              className="w-full font-medium"
+            >
+              <FaGithub className="mr-2 size-4" />
+              GitHub
+            </Button>
+          </form>
+          <form action={signInWithGoogle}>
+            <Button
+              type="submit"
+              disabled={isPending}
+              variant="outline"
+              size="lg"
+              className="w-full font-medium"
+            >
+              <FcGoogle className="mr-2 size-4" />
+              Google
+            </Button>
+          </form>
+        </div>
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground tracking-widest">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        {/* Name / Email / Password form */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -78,11 +109,13 @@ export default function SignUpCard() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="pb-1">Name</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="text"
-                      placeholder="Enter your name"
+                      placeholder="John Doe"
+                      className="bg-input/50"
                     />
                   </FormControl>
                   <FormMessage />
@@ -94,11 +127,13 @@ export default function SignUpCard() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="pb-1">Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="email"
-                      placeholder="Enter email address"
+                      placeholder="user@example.com"
+                      className="bg-input/50"
                     />
                   </FormControl>
                   <FormMessage />
@@ -110,62 +145,35 @@ export default function SignUpCard() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="pb-1">Password</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="password"
-                      placeholder="Enter password"
+                      placeholder="••••••••"
+                      className="bg-input/50"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button disabled={isPending} size="lg" className="w-full">
-              Register
+            <Button disabled={isPending} size="lg" className="w-full mt-1">
+              Create account
             </Button>
           </form>
         </Form>
-      </CardContent>
 
-      <div className="px-7">
-        <DottedSeparator />
-      </div>
-      <CardContent className="p-7 flex flex-col gap-y-4">
-        <form action={signInWithGoogle}>
-          <Button
-            type="submit"
-            disabled={isPending}
-            variant="secondary"
-            size="lg"
-            className="w-full"
+        {/* Login link */}
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/sign-in"
+            className="text-primary font-medium hover:underline underline-offset-4"
           >
-            <FcGoogle className="mr-2 size-5" />
-            Continue with Google
-          </Button>
-        </form>
-        <form action={signInWithGithub}>
-          <Button
-            type="submit"
-            disabled={isPending}
-            variant="secondary"
-            size="lg"
-            className="w-full"
-          >
-            <FaGithub className="mr-2 size-5" />
-            Continue with GitHub
-          </Button>
-        </form>
-      </CardContent>
-
-      <div className="px-7">
-        <DottedSeparator />
-      </div>
-      <CardContent className="p-7 flex items-center justify-center">
-        <p>Already have an account?</p>
-        <Link href="/sign-in">
-          <span className="text-blue-700 dark:text-blue-500">&nbsp;Login</span>
-        </Link>
+            Sign in
+          </Link>
+        </p>
       </CardContent>
     </Card>
   );

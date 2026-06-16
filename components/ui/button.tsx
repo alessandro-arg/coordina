@@ -10,9 +10,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-gradient-to-b from-blue-600 to-blue-700 text-primary-foreground dark:text-neutral-100 hover:from-blue-700 hover:to-blue-700",
+          "relative overflow-hidden bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] transition-shadow duration-200 after:absolute after:inset-0 after:bg-black/10 after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100 hover:shadow-none",
         destructive:
-          "bg-gradient-to-b from-amber-600 to-amber-700 dark:bg-gradient-to-b dark:from-muted dark:to-muted text-white dark:text-red-400 hover:from-amber-700 hover:to-amber-700",
+          "relative overflow-hidden bg-gradient-to-b from-destructive to-destructive/90 text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] transition-shadow duration-200 after:absolute after:inset-0 after:bg-black/10 after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100 hover:shadow-none",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 dark:disabled:opacity-60",
         secondary:
@@ -38,7 +38,7 @@ const buttonVariants = cva(
       variant: "primary",
       size: "default",
     },
-  }
+  },
 );
 
 export type ButtonProps = React.ComponentProps<"button"> &
