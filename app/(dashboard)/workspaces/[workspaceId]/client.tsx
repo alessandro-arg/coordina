@@ -21,12 +21,15 @@ import { MemberAvatar } from "@/app/features/members/components/members-avatar";
 import { Task } from "@/app/features/tasks/types";
 import { Project } from "@/app/features/projects/types";
 import { Member } from "@/app/features/members/types";
+import { useCurrent } from "@/app/features/auth/api/use-current";
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
+  const { data: currentUser, isLoading: isLoadingCurrentUser } = useCurrent();
+  const isDemo = currentUser?.isDemo;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -40,30 +43,51 @@ export const WorkspaceIdClient = () => {
     }
   }, [searchParams, router, workspaceId]);
 
-  const { data: analytics, isLoading: isLoadingAnalytics } =
-    useGetWorkspaceAnalytics({ workspaceId });
-  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({
-    workspaceId,
-  });
-  const { data: projects, isLoading: isLoadingProjects } = useGetProjects({
-    workspaceId,
-  });
-  const { data: members, isLoading: isLoadingMembers } = useGetMembers({
-    workspaceId,
-  });
+  const {
+    data: analytics,
+    isLoading: isLoadingAnalytics,
+    isFetching: isFetchingAnalytics,
+  } = useGetWorkspaceAnalytics({ workspaceId });
+
+  const {
+    data: tasks,
+    isLoading: isLoadingTasks,
+    isFetching: isFetchingTasks,
+  } = useGetTasks({ workspaceId });
+
+  const {
+    data: projects,
+    isLoading: isLoadingProjects,
+    isFetching: isFetchingProjects,
+  } = useGetProjects({ workspaceId });
+
+  const {
+    data: members,
+    isLoading: isLoadingMembers,
+    isFetching: isFetchingMembers,
+  } = useGetMembers({ workspaceId });
 
   const isLoading =
+    isLoadingCurrentUser ||
     isLoadingAnalytics ||
     isLoadingTasks ||
     isLoadingProjects ||
-    isLoadingMembers;
+    isLoadingMembers ||
+    isFetchingAnalytics ||
+    isFetchingTasks ||
+    isFetchingProjects ||
+    isFetchingMembers;
 
   if (isLoading) {
     return <PageLoader />;
   }
 
-  if (!analytics || !tasks || !projects || !members) {
+  if (!isLoading && (!analytics || !tasks || !projects || !members)) {
     return <PageError message="Failed to load workspace data" />;
+  }
+
+  if (!analytics || !tasks || !projects || !members) {
+    return <PageLoader />;
   }
 
   const taskRows = tasks.rows as unknown as Task[];
@@ -72,12 +96,14 @@ export const WorkspaceIdClient = () => {
 
   return (
     <div className="h-full flex flex-col space-y-4">
-      <div className="rounded-lg border bg-muted p-4">
-        <p className="font-medium">Demo Mode</p>
-        <p className="text-sm text-muted-foreground">
-          Changes are stored locally and won't affect other users.
-        </p>
-      </div>
+      {isDemo && (
+        <div className="rounded-lg border bg-muted p-4">
+          <p className="font-medium">Demo Mode</p>
+          <p className="text-sm text-muted-foreground">
+            Changes are stored locally and won't affect other users.
+          </p>
+        </div>
+      )}
       <Analytics data={analytics} />
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <TaskList data={taskRows} total={tasks.total} />
