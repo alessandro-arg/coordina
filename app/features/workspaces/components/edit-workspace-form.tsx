@@ -28,6 +28,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteWorkspace } from "../api/use-delete-workspace";
 import { toast } from "sonner";
 import { useResetInviteCode } from "../api/use-reset-invite-code";
+import { useCurrent } from "../../auth/api/use-current";
 
 interface EditWorkspaceFormProps {
   onCancel?: () => void;
@@ -44,16 +45,18 @@ export const EditWorkspaceForm = ({
     useDeleteWorkspace();
   const { mutate: resetInviteCode, isPending: isResettingInviteCode } =
     useResetInviteCode();
+  const { data: currentUser } = useCurrent();
+  const isDemo = currentUser?.isDemo;
 
   const [DeleteDialog, confirmDelete] = useConfirm(
     "Delete Workspace",
     "Are you sure you want to delete this workspace? This action cannot be undone.",
-    "destructive"
+    "destructive",
   );
   const [ResetDialog, confirmReset] = useConfirm(
     "Reset invite link",
     "This will invalidate the current invite link. Are you sure you want to proceed?",
-    "destructive"
+    "destructive",
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -67,19 +70,30 @@ export const EditWorkspaceForm = ({
   });
 
   const handleDelete = async () => {
+    if (isDemo) {
+      toast.info("Deleting workspaces is not available with demo user");
+      return;
+    }
+
     const confirmed = await confirmDelete();
     if (!confirmed) return;
+
     deleteWorkspace(
       { param: { workspaceId: initialValues.$id } },
       {
         onSuccess: () => {
           window.location.href = "/";
         },
-      }
+      },
     );
   };
 
   const handleResetInviteCode = async () => {
+    if (isDemo) {
+      toast.info("Invite members is not available with demo user");
+      return;
+    }
+
     const confirmed = await confirmReset();
     if (!confirmed) return;
     resetInviteCode({ param: { workspaceId: initialValues.$id } });
@@ -97,7 +111,7 @@ export const EditWorkspaceForm = ({
         onSuccess: () => {
           router.push(`/workspaces/${initialValues.$id}`);
         },
-      }
+      },
     );
   };
 
@@ -111,6 +125,11 @@ export const EditWorkspaceForm = ({
   const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
 
   const handleCopyInviteLink = () => {
+    if (isDemo) {
+      toast.info("Invite members is not available with demo user");
+      return;
+    }
+
     navigator.clipboard
       .writeText(fullInviteLink)
       .then(() => toast.success("Invite link copied to clipboard"));
@@ -263,6 +282,7 @@ export const EditWorkspaceForm = ({
                   onClick={handleCopyInviteLink}
                   variant="secondary"
                   className="size-12"
+                  disabled={isDemo}
                 >
                   <CopyIcon className="size-5" />
                 </Button>
@@ -274,11 +294,16 @@ export const EditWorkspaceForm = ({
               size="sm"
               variant="destructive"
               type="button"
-              disabled={isPending || isResettingInviteCode}
+              disabled={isPending || isResettingInviteCode || isDemo}
               onClick={handleResetInviteCode}
             >
               Reset invite link
             </Button>
+            {isDemo && (
+              <p className="mt-2 text-xs text-muted-foreground text-right">
+                *not available with demo user
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -296,11 +321,16 @@ export const EditWorkspaceForm = ({
               size="sm"
               variant="destructive"
               type="button"
-              disabled={isPending || isDeletingWorkspace}
+              disabled={isPending || isDeletingWorkspace || isDemo}
               onClick={handleDelete}
             >
               Delete workspace
             </Button>
+            {isDemo && (
+              <p className="mt-2 text-xs text-muted-foreground text-right">
+                *not available with demo user
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
