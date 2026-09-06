@@ -10,7 +10,7 @@
   <img alt="Next.js 16" src="https://shieldcn.dev/badge/Next.js_16.svg?variant=outline&amp;font=geist&amp;logo=nextdotjs" />
   <img alt="MongoDB" src="https://shieldcn.dev/badge/MongoDB.svg?variant=outline&amp;font=geist&amp;logo=mongodb" />
   <img alt="TypeScript" src="https://shieldcn.dev/badge/TypeScript.svg?variant=outline&amp;font=geist&amp;logo=typescript" />
-  <a href="https://github.com/alessandro-arg/coordina"><img alt="license" src="https://shieldcn.dev/github/alessandro-arg/coordina/license.svg?variant=outline&amp;font=geist" /></a>
+ <a href="https://github.com/alessandro-arg/coordina"><img alt="license" src="https://shieldcn.dev/github/alessandro-arg/portfolio/license.svg?variant=outline&amp;font=geist" /></a>
 </p>
 
 <p align="center">
