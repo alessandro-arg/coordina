@@ -100,7 +100,7 @@ export const WorkspaceIdClient = () => {
         <div className="rounded-lg border bg-muted p-4">
           <p className="font-medium">Demo Mode</p>
           <p className="text-sm text-muted-foreground">
-            Changes are stored locally and won't affect other users.
+            Changes are stored locally and won&apos;t affect other users.
           </p>
         </div>
       )}
