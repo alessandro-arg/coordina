@@ -8,7 +8,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
 
 - [x] Clean up obsolete Git branches
 - [x] Project housekeeping and metadata
-- [ ] Dependency and security audit
+- [x] Dependency and security audit
 - [ ] Authentication redirect improvements
 - [ ] Authentication loading and pending states
 - [ ] Navigation and route loading improvements
@@ -24,3 +24,15 @@ Improve maintainability, security, navigation performance, and responsive usabil
 - Keep pull requests focused and reviewable.
 - Run relevant checks before merging.
 - Merge into main only after review.
+
+## Security audit notes
+
+Audit date: 2026-10-22
+
+- Updated Next.js, Auth.js, Hono, Mongoose, and related dependencies.
+- Resolved all reported production dependency vulnerabilities.
+- Five high-severity audit findings remain in the development-only
+  ESLint dependency chain through `braces`.
+- Avoid `npm audit fix --force`, which proposes an incompatible
+  ESLint configuration downgrade.
+- Recheck the remaining advisory during future dependency updates.
