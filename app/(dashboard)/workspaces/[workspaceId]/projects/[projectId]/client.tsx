@@ -14,16 +14,15 @@ import Link from "next/link";
 
 export const ProjectIdClient = () => {
   const projectId = useProjectId();
-  const { data: project, isLoading: isLoadingProject } = useGetProject({
+
+  const { data: project, isPending: isProjectPending } = useGetProject({
     projectId,
   });
-  const { data: analytics, isLoading: isLoadingAnalytics } =
+  const { data: analytics, isPending: isAnalyticsPending } =
     useGetProjectAnalytics({ projectId });
 
-  const isLoading = isLoadingAnalytics || isLoadingProject;
-
-  if (isLoading) {
-    return <PageLoader />;
+  if (isProjectPending || isAnalyticsPending) {
+    return <PageLoader className="h-auto min-h-[50vh] w-full" />;
   }
 
   if (!project) {

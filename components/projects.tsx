@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { RiAddCircleFill } from "react-icons/ri";
+import { NavigationPendingIndicator } from "./navigation-pending-indicator";
 
 export const Projects = () => {
   const pathname = usePathname();
@@ -44,7 +45,8 @@ export const Projects = () => {
                 image={project.imageUrl ?? undefined}
                 name={project.name ?? "Project"}
               />
-              <span className="truncate">{project.name}</span>
+              <span className="min-w-0 flex-1 truncate">{project.name}</span>
+              <NavigationPendingIndicator />
             </div>
           </Link>
         );

@@ -12,6 +12,7 @@ import {
 
 import { useWorkspaceId } from "@/app/features/workspaces/hooks/use-workspace-id";
 import { usePathname } from "next/navigation";
+import { NavigationPendingIndicator } from "./navigation-pending-indicator";
 
 const routes = [
   {
@@ -56,11 +57,12 @@ export const Navigation = () => {
             <div
               className={cn(
                 "flex items-center gap-2.5 p-2.5 rounded-md font-md hover:text-primary transition text-muted-foreground",
-                isActive && "bg-muted shadow-sm hover:opacity-100 text-primary"
+                isActive && "bg-muted shadow-sm hover:opacity-100 text-primary",
               )}
             >
               <Icon className="size-5 text-muted-foreground" />
               {item.label}
+              <NavigationPendingIndicator />
             </div>
           </Link>
         );

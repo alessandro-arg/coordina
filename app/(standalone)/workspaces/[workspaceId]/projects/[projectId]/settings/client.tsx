@@ -9,10 +9,10 @@ import { Project } from "@/app/features/projects/types";
 
 export const ProjectIdSettingsClient = () => {
   const projectId = useProjectId();
-  const { data: initialValues, isLoading } = useGetProject({ projectId });
+  const { data: initialValues, isPending } = useGetProject({ projectId });
 
-  if (isLoading) {
-    return <PageLoader />;
+  if (isPending) {
+    return <PageLoader className="h-auto min-h-[50vh] w-full" />;
   }
 
   if (!initialValues) {
