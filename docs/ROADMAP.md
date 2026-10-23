@@ -11,10 +11,12 @@ Improve maintainability, security, navigation performance, and responsive usabil
 - [x] Dependency and security audit
 - [x] Authentication redirect improvements
 - [x] Authentication loading and pending states
-- [ ] Navigation and route loading improvements
+- [x] Navigation and route loading improvements
   - [x] Prevent dashboard blanking during background refetches
-  - [ ] Improve Members/Settings navigation transitions
-  - [ ] Review global and route-level loading indicators
+  - [x] Improve Members/Settings navigation transitions
+  - [x] Review global and route-level loading indicators
+  - [x] Add pending indicators to sidebar and project navigation
+  - [x] Fix premature Workspace/Project not-found states
 - [ ] Mobile sidebar and layout stability
 - [ ] Mobile task views
 - [ ] Calendar improvements

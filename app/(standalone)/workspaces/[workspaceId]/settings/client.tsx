@@ -9,10 +9,10 @@ import { PageLoader } from "@/components/page-loader";
 
 export const WorkspaceIdSettingsClient = () => {
   const workspaceId = useWorkspaceId();
-  const { data: initialValues, isLoading } = useGetWorkspace({ workspaceId });
+  const { data: initialValues, isPending } = useGetWorkspace({ workspaceId });
 
-  if (isLoading) {
-    return <PageLoader />;
+  if (isPending) {
+    return <PageLoader className="h-auto min-h-[50vh] w-full" />;
   }
 
   if (!initialValues) {
