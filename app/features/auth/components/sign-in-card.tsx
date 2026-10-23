@@ -1,18 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -31,25 +27,26 @@ import { toast } from "sonner";
 
 const DEMO_WORKSPACE_ID = "demo-workspace-1";
 
-const handleDemoLogin = async () => {
-  const result = await signIn("credentials", {
-    email: "demo@coordina.app",
-    password: "irgendwas-langes",
-    redirect: false,
-  });
-
-  if (result?.error) {
-    toast.error("Demo login failed");
-    return;
-  }
-
-  toast.success("Logged in as Demo User");
-
-  window.location.href = `/workspaces/${DEMO_WORKSPACE_ID}?demo=true`;
-};
+type AuthMethod = "credentials" | "demo" | "github" | "google";
 
 export default function SignInCard() {
+  const router = useRouter();
+
   const { mutate, isPending } = useLogin();
+  const [activeMethod, setActiveMethod] = useState<AuthMethod | null>(null);
+
+  const isAuthPending = activeMethod !== null || isPending;
+
+  const beginAuth = (method: AuthMethod) => {
+    if (isAuthPending) return false;
+
+    setActiveMethod(method);
+    return true;
+  };
+
+  const clearAuth = () => {
+    setActiveMethod(null);
+  };
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -60,7 +57,34 @@ export default function SignInCard() {
   });
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
-    mutate(values);
+    if (!beginAuth("credentials")) return;
+
+    mutate(values, {
+      onError: clearAuth,
+    });
+  };
+
+  const handleDemoLogin = async () => {
+    if (!beginAuth("demo")) return;
+
+    try {
+      const result = await signIn("credentials", {
+        email: "demo@coordina.app",
+        password: "irgendwas-langes",
+        redirect: false,
+      });
+
+      if (!result || result.error) {
+        throw new Error("Demo login failed");
+      }
+
+      toast.success("Logged in as Demo User");
+
+      router.replace(`/workspaces/${DEMO_WORKSPACE_ID}?demo=true`);
+    } catch {
+      toast.error("Demo login failed");
+      clearAuth();
+    }
   };
 
   return (
@@ -80,10 +104,13 @@ export default function SignInCard() {
 
           <Button
             type="button"
+            disabled={isAuthPending}
             className="mt-3 w-full"
             onClick={handleDemoLogin}
           >
-            Open Demo Workspace
+            {activeMethod === "demo"
+              ? "Opening demo..."
+              : "Open Demo Workspace"}
           </Button>
         </div>
       </CardHeader>
@@ -91,28 +118,42 @@ export default function SignInCard() {
       <CardContent className="p-7 pt-2 space-y-6">
         {/* OAuth buttons side by side */}
         <div className="grid grid-cols-2 gap-3">
-          <form action={signInWithGithub}>
+          <form
+            action={signInWithGithub}
+            onSubmit={(event) => {
+              if (!beginAuth("github")) {
+                event.preventDefault();
+              }
+            }}
+          >
             <Button
               type="submit"
-              disabled={isPending}
+              disabled={isAuthPending}
               variant="outline"
               size="lg"
               className="w-full font-medium"
             >
               <FaGithub className="mr-2 size-4" />
-              GitHub
+              {activeMethod === "github" ? "Connecting..." : "GitHub"}
             </Button>
           </form>
-          <form action={signInWithGoogle}>
+          <form
+            action={signInWithGoogle}
+            onSubmit={(event) => {
+              if (!beginAuth("google")) {
+                event.preventDefault();
+              }
+            }}
+          >
             <Button
               type="submit"
-              disabled={isPending}
+              disabled={isAuthPending}
               variant="outline"
               size="lg"
               className="w-full font-medium"
             >
               <FcGoogle className="mr-2 size-4" />
-              Google
+              {activeMethod === "google" ? "Connecting..." : "Google"}
             </Button>
           </form>
         </div>
@@ -172,8 +213,8 @@ export default function SignInCard() {
                 </FormItem>
               )}
             />
-            <Button disabled={isPending} size="lg" className="w-full mt-1">
-              Sign in
+            <Button disabled={isAuthPending} size="lg" className="w-full mt-1">
+              {activeMethod === "credentials" ? "Signing in..." : "Sign in"}
             </Button>
           </form>
         </Form>

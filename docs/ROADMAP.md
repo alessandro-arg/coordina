@@ -10,7 +10,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
 - [x] Project housekeeping and metadata
 - [x] Dependency and security audit
 - [x] Authentication redirect improvements
-- [ ] Authentication loading and pending states
+- [x] Authentication loading and pending states
 - [ ] Navigation and route loading improvements
 - [ ] Mobile sidebar and layout stability
 - [ ] Mobile task views
