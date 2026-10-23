@@ -1,7 +1,8 @@
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 
 type LoginValues = {
   email: string;
@@ -10,6 +11,8 @@ type LoginValues = {
 
 export const useLogin = () => {
   const router = useRouter();
+
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async (values: LoginValues) => {
@@ -27,6 +30,7 @@ export const useLogin = () => {
       return result;
     },
     onSuccess: () => {
+      setIsRedirecting(true);
       toast.success("Logged in successfully");
       router.push("/");
       router.refresh();
@@ -36,5 +40,8 @@ export const useLogin = () => {
     },
   });
 
-  return mutation;
+  return {
+    ...mutation,
+    isPending: mutation.isPending || isRedirecting,
+  };
 };

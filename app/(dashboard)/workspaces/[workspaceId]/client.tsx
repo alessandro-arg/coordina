@@ -37,6 +37,7 @@ export const WorkspaceIdClient = () => {
     if (searchParams.get("demo") === "true") {
       toast.info(
         "Demo mode enabled. All changes are stored locally and won't affect other users.",
+        { id: "demo-mode-hint" },
       );
 
       router.replace(`/workspaces/${workspaceId}`);
