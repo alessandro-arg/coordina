@@ -9,7 +9,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
 - [x] Clean up obsolete Git branches
 - [x] Project housekeeping and metadata
 - [x] Dependency and security audit
-- [ ] Authentication redirect improvements
+- [x] Authentication redirect improvements
 - [ ] Authentication loading and pending states
 - [ ] Navigation and route loading improvements
 - [ ] Mobile sidebar and layout stability
