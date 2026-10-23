@@ -12,6 +12,9 @@ Improve maintainability, security, navigation performance, and responsive usabil
 - [x] Authentication redirect improvements
 - [x] Authentication loading and pending states
 - [ ] Navigation and route loading improvements
+  - [x] Prevent dashboard blanking during background refetches
+  - [ ] Improve Members/Settings navigation transitions
+  - [ ] Review global and route-level loading indicators
 - [ ] Mobile sidebar and layout stability
 - [ ] Mobile task views
 - [ ] Calendar improvements
@@ -36,3 +39,8 @@ Audit date: 2026-10-22
 - Avoid `npm audit fix --force`, which proposes an incompatible
   ESLint configuration downgrade.
 - Recheck the remaining advisory during future dependency updates.
+
+## Known issues
+
+- [ ] Workspace invitation link fails to load workspace information.
+- [ ] Member cards overflow when names or email addresses are too long.

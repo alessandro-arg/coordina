@@ -44,51 +44,34 @@ export const WorkspaceIdClient = () => {
     }
   }, [searchParams, router, workspaceId]);
 
-  const {
-    data: analytics,
-    isLoading: isLoadingAnalytics,
-    isFetching: isFetchingAnalytics,
-  } = useGetWorkspaceAnalytics({ workspaceId });
+  const { data: analytics, isLoading: isLoadingAnalytics } =
+    useGetWorkspaceAnalytics({ workspaceId });
 
-  const {
-    data: tasks,
-    isLoading: isLoadingTasks,
-    isFetching: isFetchingTasks,
-  } = useGetTasks({ workspaceId });
+  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({
+    workspaceId,
+  });
 
-  const {
-    data: projects,
-    isLoading: isLoadingProjects,
-    isFetching: isFetchingProjects,
-  } = useGetProjects({ workspaceId });
+  const { data: projects, isLoading: isLoadingProjects } = useGetProjects({
+    workspaceId,
+  });
 
-  const {
-    data: members,
-    isLoading: isLoadingMembers,
-    isFetching: isFetchingMembers,
-  } = useGetMembers({ workspaceId });
+  const { data: members, isLoading: isLoadingMembers } = useGetMembers({
+    workspaceId,
+  });
 
   const isLoading =
     isLoadingCurrentUser ||
     isLoadingAnalytics ||
     isLoadingTasks ||
     isLoadingProjects ||
-    isLoadingMembers ||
-    isFetchingAnalytics ||
-    isFetchingTasks ||
-    isFetchingProjects ||
-    isFetchingMembers;
+    isLoadingMembers;
 
   if (isLoading) {
     return <PageLoader />;
   }
 
-  if (!isLoading && (!analytics || !tasks || !projects || !members)) {
-    return <PageError message="Failed to load workspace data" />;
-  }
-
   if (!analytics || !tasks || !projects || !members) {
-    return <PageLoader />;
+    return <PageError message="Failed to load workspace data" />;
   }
 
   const taskRows = tasks.rows as unknown as Task[];
