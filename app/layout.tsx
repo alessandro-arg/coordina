@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/components/query-provider";
@@ -27,6 +27,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,7 +41,7 @@ export default function RootLayout({
       <body
         className={cn(
           inter.className,
-          "antialiased min-h-screen bg-background text-foreground"
+          "antialiased min-h-screen bg-background text-foreground",
         )}
       >
         <ThemeProvider>

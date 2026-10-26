@@ -17,7 +17,10 @@ Improve maintainability, security, navigation performance, and responsive usabil
   - [x] Review global and route-level loading indicators
   - [x] Add pending indicators to sidebar and project navigation
   - [x] Fix premature Workspace/Project not-found states
-- [ ] Mobile sidebar and layout stability
+- [x] Mobile sidebar and layout stability
+  - [x] Fix mobile drawer backdrop and interaction
+  - [x] Improve light/dark sidebar background consistency
+  - [x] Support mobile top and bottom safe areas
 - [ ] Mobile task views
 - [ ] Calendar improvements
 - [ ] Lightweight SEO improvements

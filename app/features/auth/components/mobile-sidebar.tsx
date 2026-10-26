@@ -23,13 +23,17 @@ export const MobileSidebar = () => {
   }, [pathname]);
 
   return (
-    <Sheet modal={false} open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button variant="secondary" className="lg:hidden">
           <MenuIcon className="size-4 text-neutral-500 dark:text-primary" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0" aria-describedby={undefined}>
+      <SheetContent
+        side="left"
+        className="bg-background p-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] [&>button]:top-[calc(1rem+env(safe-area-inset-top))]"
+        aria-describedby={undefined}
+      >
         <SheetHeader className="sr-only">
           <SheetTitle>Navigation</SheetTitle>
         </SheetHeader>

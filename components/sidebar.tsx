@@ -7,7 +7,7 @@ import { Projects } from "./projects";
 
 export const Sidebar = () => {
   return (
-    <aside className="h-full bg-card p-4 w-full">
+    <aside className="h-full w-full p-4 bg-background lg:bg-muted dark:lg:bg-card">
       <Link href="/">
         <Image
           src="/logo.svg"
