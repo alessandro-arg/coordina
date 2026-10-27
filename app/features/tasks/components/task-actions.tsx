@@ -10,14 +10,33 @@ import { useDeleteTask } from "../api/use-delete-task";
 import { useRouter } from "next/navigation";
 import { useWorkspaceId } from "../../workspaces/hooks/use-workspace-id";
 import { useEditTaskModal } from "../hooks/use-edit-task-modal";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useUpdateTask } from "../api/use-update-task";
+import { TaskStatus } from "../types";
+import { snakeCaseToTitleCase } from "@/lib/utils";
+
+const statusOrder = [
+  TaskStatus.BACKLOG,
+  TaskStatus.TODO,
+  TaskStatus.IN_PROGRESS,
+  TaskStatus.IN_REVIEW,
+  TaskStatus.DONE,
+];
 
 interface TaskActionsProps {
   id: string;
   projectId: string;
   children: React.ReactNode;
+  quickStatus?: TaskStatus;
 }
 
-export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
+export const TaskActions = ({
+  id,
+  projectId,
+  children,
+  quickStatus,
+}: TaskActionsProps) => {
   const router = useRouter();
   const workspaceId = useWorkspaceId();
   const { open } = useEditTaskModal();
@@ -25,7 +44,7 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
   const [ConfirmDialog, confirm] = useConfirm(
     "Delete task",
     "This action cannot be undone.",
-    "destructive"
+    "destructive",
   );
   const { mutate, isPending } = useDeleteTask();
 
@@ -41,6 +60,23 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
 
   const onOpenProject = () => {
     router.push(`/workspaces/${workspaceId}/projects/${projectId}`);
+  };
+
+  const { mutate: updateStatus, isPending: isUpdatingStatus } = useUpdateTask();
+
+  const statusIndex = quickStatus ? statusOrder.indexOf(quickStatus) : -1;
+
+  const previousStatus =
+    statusIndex > 0 ? statusOrder[statusIndex - 1] : undefined;
+
+  const nextStatus =
+    statusIndex >= 0 ? statusOrder[statusIndex + 1] : undefined;
+
+  const moveToStatus = (status: TaskStatus) => {
+    updateStatus({
+      param: { taskId: id },
+      json: { status },
+    });
   };
 
   return (
@@ -68,6 +104,33 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
             <PencilIcon className="size-4 mr-1 stroke-2" />
             Edit task
           </DropdownMenuItem>
+
+          {quickStatus && (
+            <>
+              <DropdownMenuSeparator />
+
+              {previousStatus && (
+                <DropdownMenuItem
+                  disabled={isUpdatingStatus}
+                  onClick={() => moveToStatus(previousStatus)}
+                >
+                  <ChevronLeft className="size-4" />
+                  Move to {snakeCaseToTitleCase(previousStatus)}
+                </DropdownMenuItem>
+              )}
+
+              {nextStatus && (
+                <DropdownMenuItem
+                  disabled={isUpdatingStatus}
+                  onClick={() => moveToStatus(nextStatus)}
+                >
+                  <ChevronRight className="size-4" />
+                  Move to {snakeCaseToTitleCase(nextStatus)}
+                </DropdownMenuItem>
+              )}
+            </>
+          )}
+
           <DropdownMenuItem
             onClick={onDelete}
             disabled={isPending}

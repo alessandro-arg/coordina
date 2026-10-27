@@ -18,6 +18,8 @@ import { Task, TaskStatus } from "../types";
 import { useBulkUpdateTasks } from "../api/use-bulk-update-tasks";
 import { DataCalendar } from "./data-calendar";
 import { useProjectId } from "../../projects/hooks/use-project-id";
+import { MobileTaskList } from "./mobile-task-list";
+import { MobileKanban } from "./mobile-kanban";
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
@@ -66,19 +68,19 @@ export const TaskViewSwitcher = ({
           <TabsList className="w-full lg:w-auto">
             <TabsTrigger
               value="table"
-              className="h-8 w-full lg:w-auto min-w-20"
+              className="h-8 min-w-0 w-full lg:w-auto lg:min-w-20"
             >
               Table
             </TabsTrigger>
             <TabsTrigger
               value="kanban"
-              className="h-8 w-full lg:w-auto min-w-20"
+              className="h-8 min-w-0 w-full lg:w-auto lg:min-w-20"
             >
               Kanban
             </TabsTrigger>
             <TabsTrigger
               value="calendar"
-              className="h-8 w-full lg:w-auto min-w-20"
+              className="h-8 min-w-0 w-full lg:w-auto lg:min-w-20"
             >
               Calendar
             </TabsTrigger>
@@ -98,11 +100,25 @@ export const TaskViewSwitcher = ({
         ) : (
           <>
             <TabsContent value="table" className="mt-0">
-              <DataTable columns={columns} data={taskRows} />
+              <div className="lg:hidden">
+                <MobileTaskList tasks={taskRows} />
+              </div>
+
+              <div className="hidden lg:block">
+                <DataTable columns={columns} data={taskRows} />
+              </div>
             </TabsContent>
+
             <TabsContent value="kanban" className="mt-0">
-              <DataKanban onChange={onKanbanChange} data={taskRows} />
+              <div className="lg:hidden">
+                <MobileKanban data={taskRows} />
+              </div>
+
+              <div className="hidden lg:block">
+                <DataKanban onChange={onKanbanChange} data={taskRows} />
+              </div>
             </TabsContent>
+
             <TabsContent value="calendar" className="mt-0 h-full pb-4">
               <DataCalendar data={taskRows} />
             </TabsContent>
