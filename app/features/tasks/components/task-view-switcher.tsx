@@ -20,6 +20,8 @@ import { DataCalendar } from "./data-calendar";
 import { useProjectId } from "../../projects/hooks/use-project-id";
 import { MobileTaskList } from "./mobile-task-list";
 import { MobileKanban } from "./mobile-kanban";
+import { MobileAgenda } from "./mobile-agenda";
+import { isSameDay } from "date-fns";
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
@@ -28,7 +30,8 @@ interface TaskViewSwitcherProps {
 export const TaskViewSwitcher = ({
   hideProjectFilter,
 }: TaskViewSwitcherProps) => {
-  const [{ status, assigneeId, projectId, dueDate }] = useTaskFilters();
+  const [{ status, assigneeId, projectId, dueDate }, setFilters] =
+    useTaskFilters();
 
   const [view, setView] = useQueryState("task-view", {
     defaultValue: "table",
@@ -45,7 +48,7 @@ export const TaskViewSwitcher = ({
     projectId: paramProjectId || projectId,
     assigneeId,
     status,
-    dueDate,
+    dueDate: view === "calendar" ? undefined : dueDate,
   });
 
   const taskRows = (tasks?.rows ?? []) as unknown as Task[];
@@ -120,7 +123,29 @@ export const TaskViewSwitcher = ({
             </TabsContent>
 
             <TabsContent value="calendar" className="mt-0 h-full pb-4">
-              <DataCalendar data={taskRows} />
+              <div className="lg:hidden">
+                <MobileAgenda
+                  data={taskRows}
+                  selectedDay={dueDate ? new Date(dueDate) : new Date()}
+                  onSelectedDayChange={(date) =>
+                    setFilters({
+                      dueDate: date ? date.toISOString() : null,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="hidden lg:block h-full">
+                <DataCalendar
+                  data={
+                    dueDate
+                      ? taskRows.filter((task) =>
+                          isSameDay(new Date(task.dueDate), new Date(dueDate)),
+                        )
+                      : taskRows
+                  }
+                />
+              </div>
             </TabsContent>
           </>
         )}
