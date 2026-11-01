@@ -13,7 +13,7 @@ import { useTaskFilters } from "../hooks/use-task-filters";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { DataKanban } from "./data-kanban";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Task, TaskStatus } from "../types";
 import { useBulkUpdateTasks } from "../api/use-bulk-update-tasks";
 import { DataCalendar } from "./data-calendar";
@@ -22,6 +22,8 @@ import { MobileTaskList } from "./mobile-task-list";
 import { MobileKanban } from "./mobile-kanban";
 import { MobileAgenda } from "./mobile-agenda";
 import { isSameDay } from "date-fns";
+
+const EMPTY_TASK_ROWS: Task[] = [];
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
@@ -50,13 +52,17 @@ export const TaskViewSwitcher = ({
     status,
   });
 
-  const taskRows = (tasks?.rows ?? []) as unknown as Task[];
+  const taskRows = (tasks?.rows ?? EMPTY_TASK_ROWS) as unknown as Task[];
 
-  const filteredTaskRows = dueDate
-    ? taskRows.filter((task) =>
-        isSameDay(new Date(task.dueDate), new Date(dueDate)),
-      )
-    : taskRows;
+  const filteredTaskRows = useMemo(
+    () =>
+      dueDate
+        ? taskRows.filter((task) =>
+            isSameDay(new Date(task.dueDate), new Date(dueDate)),
+          )
+        : taskRows,
+    [taskRows, dueDate],
+  );
 
   const onKanbanChange = useCallback(
     (tasks: { $id: string; status: TaskStatus; position: number }[]) => {
