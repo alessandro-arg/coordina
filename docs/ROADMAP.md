@@ -21,7 +21,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
   - [x] Fix mobile drawer backdrop and interaction
   - [x] Improve light/dark sidebar background consistency
   - [x] Support mobile top and bottom safe areas
-- [ ] Mobile task views
+- [x] Mobile task views
 - [ ] Calendar improvements
 - [ ] Lightweight SEO improvements
 - [ ] Final accessibility and performance review

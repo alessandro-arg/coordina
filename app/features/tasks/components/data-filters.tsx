@@ -54,7 +54,7 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
 
   const onAssigneeChange = (value: string) => {
     if (value === "all") {
-      setFilters({ status: null });
+      setFilters({ assigneeId: null });
     } else {
       setFilters({ assigneeId: value as string });
     }
@@ -74,6 +74,7 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
       assigneeId: null,
       projectId: null,
       dueDate: null,
+      search: null,
     });
   };
 
@@ -81,12 +82,7 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
 
   return (
     <div className="flex flex-col lg:flex-row gap-2">
-      <Select
-        defaultValue={status || undefined}
-        onValueChange={(value) => {
-          onStatusChange(value);
-        }}
-      >
+      <Select value={status ?? ""} onValueChange={onStatusChange}>
         <SelectTrigger className="w-full lg:w-auto h-8 hover:bg-accent transition">
           <div className="flex items-center pr-2">
             <ListCheckIcon className="size-4 mr-2" />
@@ -103,12 +99,8 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
           <SelectItem value={TaskStatus.DONE}>Done</SelectItem>
         </SelectContent>
       </Select>
-      <Select
-        defaultValue={assigneeId || undefined}
-        onValueChange={(value) => {
-          onAssigneeChange(value);
-        }}
-      >
+
+      <Select value={assigneeId ?? ""} onValueChange={onAssigneeChange}>
         <SelectTrigger className="w-full lg:w-auto h-8 hover:bg-accent transition">
           <div className="flex items-center pr-2">
             <UserIcon className="size-4 mr-2" />
@@ -126,12 +118,7 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
         </SelectContent>
       </Select>
       {!hideProjectFilter && (
-        <Select
-          defaultValue={projectId || undefined}
-          onValueChange={(value) => {
-            onProjectChange(value);
-          }}
-        >
+        <Select value={projectId ?? ""} onValueChange={onProjectChange}>
           <SelectTrigger className="w-full lg:w-auto h-8 hover:bg-accent transition">
             <div className="flex items-center pr-2">
               <FolderIcon className="size-4 mr-2" />

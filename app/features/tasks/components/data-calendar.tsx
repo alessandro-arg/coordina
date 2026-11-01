@@ -30,6 +30,8 @@ const localizer = dateFnsLocalizer({
 
 interface DataCalendarProps {
   data: Task[];
+  selectedDate?: Date;
+  onClearDate: () => void;
 }
 
 interface CustomToolbarProps {
@@ -62,10 +64,16 @@ const CustomToolbar = ({ date, onNavigate }: CustomToolbarProps) => {
   );
 };
 
-export const DataCalendar = ({ data }: DataCalendarProps) => {
+export const DataCalendar = ({
+  data,
+  selectedDate,
+  onClearDate,
+}: DataCalendarProps) => {
   const [value, setValue] = useState(
-    data.length > 0 ? new Date(data[0].dueDate) : new Date()
+    data.length > 0 ? new Date(data[0].dueDate) : new Date(),
   );
+
+  const displayedDate = selectedDate ?? value;
 
   const events = data.map((task) => ({
     start: new Date(task.dueDate),
@@ -79,18 +87,22 @@ export const DataCalendar = ({ data }: DataCalendarProps) => {
 
   const handleNavigate = (action: "PREV" | "NEXT" | "TODAY") => {
     if (action === "PREV") {
-      setValue(subMonths(value, 1));
+      setValue(subMonths(displayedDate, 1));
     } else if (action === "NEXT") {
-      setValue(addMonths(value, 1));
-    } else if (action === "TODAY") {
+      setValue(addMonths(displayedDate, 1));
+    } else {
       setValue(new Date());
+    }
+
+    if (selectedDate) {
+      onClearDate();
     }
   };
 
   return (
     <Calendar
       localizer={localizer}
-      date={value}
+      date={displayedDate}
       events={events}
       views={["month"]}
       defaultView="month"
@@ -113,7 +125,7 @@ export const DataCalendar = ({ data }: DataCalendarProps) => {
           />
         ),
         toolbar: () => (
-          <CustomToolbar date={value} onNavigate={handleNavigate} />
+          <CustomToolbar date={displayedDate} onNavigate={handleNavigate} />
         ),
       }}
     />
