@@ -48,10 +48,15 @@ export const TaskViewSwitcher = ({
     projectId: paramProjectId || projectId,
     assigneeId,
     status,
-    dueDate: view === "calendar" ? undefined : dueDate,
   });
 
   const taskRows = (tasks?.rows ?? []) as unknown as Task[];
+
+  const filteredTaskRows = dueDate
+    ? taskRows.filter((task) =>
+        isSameDay(new Date(task.dueDate), new Date(dueDate)),
+      )
+    : taskRows;
 
   const onKanbanChange = useCallback(
     (tasks: { $id: string; status: TaskStatus; position: number }[]) => {
@@ -104,21 +109,21 @@ export const TaskViewSwitcher = ({
           <>
             <TabsContent value="table" className="mt-0">
               <div className="lg:hidden">
-                <MobileTaskList tasks={taskRows} />
+                <MobileTaskList tasks={filteredTaskRows} />
               </div>
 
               <div className="hidden lg:block">
-                <DataTable columns={columns} data={taskRows} />
+                <DataTable columns={columns} data={filteredTaskRows} />
               </div>
             </TabsContent>
 
             <TabsContent value="kanban" className="mt-0">
               <div className="lg:hidden">
-                <MobileKanban data={taskRows} />
+                <MobileKanban data={filteredTaskRows} />
               </div>
 
               <div className="hidden lg:block">
-                <DataKanban onChange={onKanbanChange} data={taskRows} />
+                <DataKanban onChange={onKanbanChange} data={filteredTaskRows} />
               </div>
             </TabsContent>
 
@@ -137,13 +142,9 @@ export const TaskViewSwitcher = ({
 
               <div className="hidden lg:block h-full">
                 <DataCalendar
-                  data={
-                    dueDate
-                      ? taskRows.filter((task) =>
-                          isSameDay(new Date(task.dueDate), new Date(dueDate)),
-                        )
-                      : taskRows
-                  }
+                  data={taskRows}
+                  selectedDate={dueDate ? new Date(dueDate) : undefined}
+                  onClearDate={() => setFilters({ dueDate: null })}
                 />
               </div>
             </TabsContent>
