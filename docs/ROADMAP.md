@@ -22,7 +22,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
   - [x] Improve light/dark sidebar background consistency
   - [x] Support mobile top and bottom safe areas
 - [x] Mobile task views
-- [ ] Calendar improvements
+- [x] Calendar improvements
 - [ ] Lightweight SEO improvements
 - [ ] Final accessibility and performance review
 
