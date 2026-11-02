@@ -14,7 +14,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./data-calendar.css";
 import { EventCard } from "./event-card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const locales = {
   "en-US": enUS,
@@ -41,25 +41,36 @@ interface CustomToolbarProps {
 
 const CustomToolbar = ({ date, onNavigate }: CustomToolbarProps) => {
   return (
-    <div className="flex mb-4 gap-x-2 items-center w-full lg:w-auto justify-center lg:justify-start">
-      <Button
-        onClick={() => onNavigate("PREV")}
-        variant="secondary"
-        size="icon"
-      >
-        <ChevronLeftIcon className="size-4" />
-      </Button>
-      <div className="bg-card flex items-center border border-input rounded-md px-3 py-2 h-8 justify-center w-full lg:w-auto cursor-default">
-        <CalendarIcon className="size-4 mr-2" />
-        <p className="text-sm">{format(date, "MMMM yyyy")}</p>
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <h2 className="text-base font-semibold tracking-tight">
+        {format(date, "MMMM yyyy")}
+      </h2>
+
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" onClick={() => onNavigate("TODAY")}>
+          Today
+        </Button>
+
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Previous month"
+            onClick={() => onNavigate("PREV")}
+          >
+            <ChevronLeftIcon className="size-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Next month"
+            onClick={() => onNavigate("NEXT")}
+          >
+            <ChevronRightIcon className="size-4" />
+          </Button>
+        </div>
       </div>
-      <Button
-        onClick={() => onNavigate("NEXT")}
-        variant="secondary"
-        size="icon"
-      >
-        <ChevronRightIcon className="size-4" />
-      </Button>
     </div>
   );
 };
