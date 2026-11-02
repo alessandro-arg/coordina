@@ -1,7 +1,7 @@
-@reference "tailwindcss";
+@reference "../../../globals.css";
 
 .rbc-header {
-  @apply text-sm border-b-0 font-normal pb-4;
+  @apply border-b-0 pb-3 text-xs font-medium;
   color: var(--muted-foreground);
 }
 
@@ -15,7 +15,7 @@
 }
 
 .rbc-month-row {
-  @apply min-h-[180px] border-t border-x;
+  @apply min-h-[128px] border-t border-x;
 }
 
 .rbc-month-row:last-of-type {
@@ -35,19 +35,109 @@
 }
 
 .rbc-off-range-bg {
-  background: inherit;
+  @apply bg-muted/30;
 }
 
 .rbc-day-bg.rbc-today {
-  @apply bg-blue-100;
+  @apply bg-primary/5;
 }
 
-/* Month view: today's background in dark mode */
 .dark .rbc-day-bg.rbc-today {
-  @apply bg-blue-900/30;
+  @apply bg-primary/10;
 }
 
 /* Optional: header cell (day number) styling for today */
 .rbc-date-cell.rbc-now {
   @apply font-semibold;
+}
+
+.rbc-month-view .rbc-event {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Calendar popup */
+.rbc-overlay {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+}
+
+/* Popup date header */
+.rbc-overlay-header {
+  margin: -0.5rem -0.5rem 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--popover-foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Remove default blue event backgrounds */
+.rbc-overlay .rbc-event,
+.rbc-overlay .rbc-event.rbc-selected {
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Preserve keyboard focus indication */
+.rbc-overlay .rbc-event:focus {
+  outline: none;
+}
+
+.rbc-overlay .rbc-event:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/* Calendar day numbers */
+.rbc-date-cell > .rbc-button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+/* Current day */
+.rbc-date-cell.rbc-now > .rbc-button-link {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+}
+
+/* Days outside the current month */
+.rbc-date-cell.rbc-off-range > .rbc-button-link {
+  opacity: 0.4;
+}
+
+/* Additional tasks link */
+.rbc-show-more {
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.375rem;
+  border-radius: 0.25rem;
+  text-align: left;
+}
+
+.rbc-show-more:hover {
+  color: var(--accent-foreground);
+}
+
+.rbc-show-more:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }

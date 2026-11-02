@@ -69,9 +69,7 @@ export const DataCalendar = ({
   selectedDate,
   onClearDate,
 }: DataCalendarProps) => {
-  const [value, setValue] = useState(
-    data.length > 0 ? new Date(data[0].dueDate) : new Date(),
-  );
+  const [value, setValue] = useState(() => new Date());
 
   const displayedDate = selectedDate ?? value;
 
@@ -107,7 +105,7 @@ export const DataCalendar = ({
       views={["month"]}
       defaultView="month"
       toolbar
-      showAllEvents
+      popup
       className="h-full"
       max={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
       formats={{
@@ -115,7 +113,7 @@ export const DataCalendar = ({
           localizer?.format(date, "EEE", culture) ?? "",
       }}
       components={{
-        eventWrapper: ({ event }) => (
+        event: ({ event }) => (
           <EventCard
             id={event.id}
             title={event.title}
