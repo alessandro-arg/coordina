@@ -106,6 +106,8 @@ interface TaskListProps {
 export const TaskList = ({ data, total }: TaskListProps) => {
   const workspaceId = useWorkspaceId();
   const { open: createTask } = useCreateTaskModal();
+  const visibleTasks = data.slice(0, 4);
+  const remainingCount = Math.max(0, data.length - visibleTasks.length);
 
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
@@ -118,7 +120,7 @@ export const TaskList = ({ data, total }: TaskListProps) => {
         </div>
         <DottedSeparator className="my-4" />
         <ul className="flex flex-col gap-y-4">
-          {data.map((task) => (
+          {visibleTasks.map((task) => (
             <li key={task.$id}>
               <Link href={`/workspaces/${workspaceId}/tasks/${task.$id}`}>
                 <Card className="shadow-none rounded-lg hover:opacity-75 transition py-0">
@@ -143,6 +145,11 @@ export const TaskList = ({ data, total }: TaskListProps) => {
             No tasks found
           </li>
         </ul>
+        {remainingCount > 0 && (
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            +{remainingCount} more
+          </p>
+        )}
         <Button variant="muted" className="mt-4 w-full" asChild>
           <Link href={`/workspaces/${workspaceId}/tasks`}>Show all</Link>
         </Button>
