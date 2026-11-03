@@ -2,10 +2,8 @@ import { cn } from "@/lib/utils";
 import { Project } from "../../projects/types";
 import { Member } from "../../members/types";
 import { TaskStatus } from "../types";
-import { MemberAvatar } from "../../members/components/members-avatar";
-import { ProjectAvatar } from "../../projects/components/project-avatar";
 import { useWorkspaceId } from "../../workspaces/hooks/use-workspace-id";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface EventCardProps {
   title: string;
@@ -23,42 +21,24 @@ const statusColorMap: Record<TaskStatus, string> = {
   [TaskStatus.DONE]: "border-l-emerald-500",
 };
 
-export const EventCard = ({
-  title,
-  assignee,
-  project,
-  status,
-  id,
-}: EventCardProps) => {
+export const EventCard = ({ title, project, status, id }: EventCardProps) => {
   const workspaceId = useWorkspaceId();
-  const router = useRouter();
-
-  const onClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
-    router.push(`/workspaces/${workspaceId}/tasks/${id}`);
-  };
 
   if (!project?.name) {
     return null;
   }
 
   return (
-    <div className="px-2">
-      <div
-        onClick={onClick}
-        className={cn(
-          "p-1.5 text-xs bg-card text-primary border rounded-md border-l-4 flex flex-col gap-y-1.5 cursor-pointer hover:opacity-75 transition",
-          statusColorMap[status],
-        )}
-      >
-        <p>{title}</p>
-        <div className="flex items-center gap-x-1">
-          <MemberAvatar name={assignee?.name ?? "User"} />
-          <div className="size-1 rounded-full bg-neutral-300"></div>
-          <ProjectAvatar name={project?.name ?? "Project"} />
-        </div>
-      </div>
-    </div>
+    <Link
+      href={`/workspaces/${workspaceId}/tasks/${id}`}
+      onClick={(e) => e.stopPropagation()}
+      title={title}
+      className={cn(
+        "flex h-5 w-full min-w-0 items-center overflow-hidden rounded-sm border-l-[3px] bg-card px-1.5 ml-1 text-xs text-foreground transition-colors hover:bg-accent/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        statusColorMap[status],
+      )}
+    >
+      <span className="min-w-0 flex-1 truncate">{title}</span>
+    </Link>
   );
 };
