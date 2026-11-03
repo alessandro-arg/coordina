@@ -23,7 +23,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
   - [x] Support mobile top and bottom safe areas
 - [x] Mobile task views
 - [x] Calendar improvements
-- [ ] Lightweight SEO improvements
+- [x] Lightweight SEO improvements
 - [ ] Final accessibility and performance review
 
 ## Development workflow
