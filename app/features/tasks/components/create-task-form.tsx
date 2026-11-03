@@ -12,7 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import DottedSeparator from "@/components/dotted-separator";
+import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCreateTask } from "../api/use-create-task";
@@ -76,7 +76,7 @@ export const CreateTaskForm = ({
       </CardHeader>
 
       <div className="px-7">
-        <DottedSeparator />
+        <Separator />
       </div>
       <CardContent className="p-7">
         <Form {...form}>
@@ -209,7 +209,7 @@ export const CreateTaskForm = ({
                 )}
               />
             </div>
-            <DottedSeparator className="py-7" />
+            <Separator className="my-7" />
             <div className="flex items-center justify-between">
               <Button
                 type="button"

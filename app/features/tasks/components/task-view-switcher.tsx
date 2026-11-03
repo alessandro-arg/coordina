@@ -1,6 +1,6 @@
 "use client";
 
-import DottedSeparator from "@/components/dotted-separator";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoaderCircle, PlusIcon } from "lucide-react";
@@ -104,9 +104,9 @@ export const TaskViewSwitcher = ({
             New
           </Button>
         </div>
-        <DottedSeparator className="my-4" />
+        <Separator className="my-4" />
         <DataFilters hideProjectFilter={hideProjectFilter} />
-        <DottedSeparator className="my-4" />
+        <Separator className="my-4" />
         {isLoadingTasks ? (
           <div className="w-full border rounded-lg h-50 flex flex-col items-center justify-center">
             <LoaderCircle className="size-5 animate-spin text-muted-foreground" />

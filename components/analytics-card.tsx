@@ -21,7 +21,7 @@ export const AnalyticsCard = ({
   const Icon = variant === "up" ? FaCaretUp : FaCaretDown;
 
   return (
-    <Card className="shadow-none border-none w-full">
+    <Card className="shadow-none border-none w-full bg-transparent">
       <CardHeader>
         <div className="flex items-center gap-x-2.5">
           <CardDescription className="flex items-center gap-x-2 font-medium overflow-hidden">
@@ -32,7 +32,7 @@ export const AnalyticsCard = ({
             <span
               className={cn(
                 increaseValueColor,
-                "truncate text-base font-medium"
+                "truncate text-base font-medium",
               )}
             >
               {increaseValue}

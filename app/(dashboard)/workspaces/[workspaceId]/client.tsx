@@ -9,11 +9,16 @@ import { useCreateTaskModal } from "@/app/features/tasks/hooks/use-create-task-m
 import { useGetWorkspaceAnalytics } from "@/app/features/workspaces/api/use-get-workspace-analytics";
 import { useWorkspaceId } from "@/app/features/workspaces/hooks/use-workspace-id";
 import { Analytics } from "@/components/analytics";
-import DottedSeparator from "@/components/dotted-separator";
+import { Separator } from "@/components/ui/separator";
 import { PageError } from "@/components/page-error";
 import { PageLoader } from "@/components/page-loader";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, PlusIcon, SettingsIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  PlusIcon,
+  SettingsIcon,
+  SparklesIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { generateDemoTasks } from "@/lib/demo-storage";
@@ -102,22 +107,32 @@ export const WorkspaceIdClient = () => {
   return (
     <div className="h-full flex flex-col space-y-4">
       {isDemo && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted p-4">
-          <div>
-            <p className="font-medium">Demo Mode</p>
-            <p className="text-sm text-muted-foreground">
-              Changes are stored locally and won&apos;t affect other users.
-            </p>
-          </div>
+        <div className="rounded-lg border bg-neutral-100 dark:bg-muted p-4">
+          <p className="font-medium">Demo Mode</p>
+          <p className="text-sm text-muted-foreground">
+            Changes are stored locally and won&apos;t affect other users.
+          </p>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleGenerateDemoTasks}
-          >
-            Generate 20 tasks
-          </Button>
+          <div className="my-4 border-t border-border" />
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium">Need more test data?</p>
+              <p className="text-sm text-muted-foreground">
+                Generate sample tasks to explore the UI.
+              </p>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleGenerateDemoTasks}
+            >
+              <SparklesIcon className="size-4" />
+              Generate 20 tasks
+            </Button>
+          </div>
         </div>
       )}
 
@@ -144,19 +159,19 @@ export const TaskList = ({ data, total }: TaskListProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
-      <div className="bg-muted dark:bg-neutral-800 rounded-lg p-4">
+      <div className="bg-neutral-100 dark:bg-muted border rounded-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Tasks ({total})</p>
           <Button variant="muted" size="icon" onClick={createTask}>
             <PlusIcon className="size-5 text-neutral-400" />
           </Button>
         </div>
-        <DottedSeparator className="my-4" />
+        <Separator className="my-4" />
         <ul className="flex flex-col gap-y-4">
           {visibleTasks.map((task) => (
             <li key={task.$id}>
               <Link href={`/workspaces/${workspaceId}/tasks/${task.$id}`}>
-                <Card className="shadow-none rounded-lg hover:opacity-75 transition py-0">
+                <Card className="bg-neutral-200/50 dark:bg-background shadow-none rounded-lg hover:opacity-75 transition py-0">
                   <CardContent className="p-4">
                     <p className="text-lg font-medium truncate">{task.name}</p>
                     <div className="flex items-center gap-x-2">
@@ -202,19 +217,19 @@ export const ProjectList = ({ data, total }: ProjectListProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
-      <div className="bg-card border rounded-lg p-4">
+      <div className="bg-neutral-100 dark:bg-muted border rounded-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Projects ({total})</p>
           <Button variant="secondary" size="icon" onClick={createProject}>
             <PlusIcon className="size-5 text-neutral-400" />
           </Button>
         </div>
-        <DottedSeparator className="my-4" />
+        <Separator className="my-4" />
         <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {data.map((project) => (
             <li key={project.$id}>
               <Link href={`/workspaces/${workspaceId}/projects/${project.$id}`}>
-                <Card className="dark:bg-card dark:border-border shadow-none rounded-lg hover:opacity-75 transition py-0">
+                <Card className="bg-neutral-200/50 dark:bg-background shadow-none rounded-lg hover:opacity-75 transition py-0">
                   <CardContent className="p-4 flex items-center gap-x-2.5">
                     <ProjectAvatar
                       name={project.name}
@@ -249,7 +264,7 @@ export const MembersList = ({ data, total }: MembersListProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
-      <div className="bg-card border rounded-lg p-4">
+      <div className="bg-neutral-100 dark:bg-muted border rounded-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Members ({total})</p>
           <Button variant="secondary" size="icon" asChild>
@@ -258,11 +273,11 @@ export const MembersList = ({ data, total }: MembersListProps) => {
             </Link>
           </Button>
         </div>
-        <DottedSeparator className="my-4" />
+        <Separator className="my-4" />
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {data.map((member) => (
             <li key={member.$id}>
-              <Card className="dark:bg-card dark:border-border shadow-none rounded-lg overflow-hidden py-0">
+              <Card className="bg-neutral-200/50 dark:bg-background shadow-none rounded-lg overflow-hidden py-0">
                 <CardContent className="p-3 flex flex-col items-center gap-x-2">
                   <MemberAvatar
                     name={member.name ?? "User"}

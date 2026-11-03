@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Task } from "../types";
 import { PencilIcon, XIcon } from "lucide-react";
-import DottedSeparator from "@/components/dotted-separator";
+import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { useUpdateTask } from "../api/use-update-task";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,7 +26,7 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
         onSuccess: () => {
           setIsEditing(false);
         },
-      }
+      },
     );
   };
 
@@ -47,7 +47,7 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
           {isEditing ? "Cancel" : "Edit"}
         </Button>
       </div>
-      <DottedSeparator className="my-4" />
+      <Separator className="my-4" />
       {isEditing ? (
         <div className="flex flex-col gap-y-4">
           <Textarea

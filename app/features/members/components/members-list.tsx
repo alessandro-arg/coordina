@@ -5,7 +5,6 @@ import { useWorkspaceId } from "../../workspaces/hooks/use-workspace-id";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeftCircleIcon, MoreVerticalIcon } from "lucide-react";
 import Link from "next/link";
-import DottedSeparator from "@/components/dotted-separator";
 import { useGetMembers } from "../../members/api/use-get-members";
 import { Fragment } from "react/jsx-runtime";
 import { MemberAvatar } from "../../members/components/members-avatar";
@@ -71,7 +70,7 @@ export const MemberList = () => {
         <CardTitle className="text-xl font-bold">Members list</CardTitle>
       </CardHeader>
       <div className="px-7">
-        <DottedSeparator />
+        <Separator />
       </div>
       <CardContent className="p-7">
         {data?.rows.map((member, index) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import DottedSeparator from "@/components/dotted-separator";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,7 +39,7 @@ export const JoinWorkspaceForm = ({
         onSuccess: ({ data }) => {
           router.push(`/workspaces/${data.$id}`);
         },
-      }
+      },
     );
   };
 
@@ -53,7 +53,7 @@ export const JoinWorkspaceForm = ({
         </CardDescription>
       </CardHeader>
       <div className="px-7">
-        <DottedSeparator />
+        <Separator />
       </div>
       <CardContent className="p-7">
         <div className="flex flex-col sm:flex-row gap-y-2 items-center justify-between">

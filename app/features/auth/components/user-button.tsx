@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import DottedSeparator from "../../../../components/dotted-separator";
+import { Separator } from "@/components/ui/separator";
 import { useLogout } from "../api/use-logout";
 import { useCurrent } from "../api/use-current";
 import { LoaderCircle, LogOut } from "lucide-react";
@@ -61,7 +61,7 @@ export const UserButton = () => {
             <p className="text-xs text-muted-foreground">{email || "Email"}</p>
           </div>
         </div>
-        <DottedSeparator className="mb-1 px-4" />
+        <Separator className="mb-1 mx-4 w-auto" />
         <DropdownMenuItem
           onSelect={(e) => {
             e.preventDefault();
