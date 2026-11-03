@@ -15,6 +15,8 @@ import { PageLoader } from "@/components/page-loader";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
+import { generateDemoTasks } from "@/lib/demo-storage";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProjectAvatar } from "@/app/features/projects/components/project-avatar";
 import { MemberAvatar } from "@/app/features/members/components/members-avatar";
@@ -32,6 +34,25 @@ export const WorkspaceIdClient = () => {
   const isDemo = currentUser?.isDemo;
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const queryClient = useQueryClient();
+
+  const handleGenerateDemoTasks = () => {
+    if (!isDemo) return;
+
+    const count = generateDemoTasks(workspaceId);
+
+    if (count === 0) {
+      toast.error("Demo projects or members are missing.");
+      return;
+    }
+
+    void queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    void queryClient.invalidateQueries({ queryKey: ["workspace-analytics"] });
+    void queryClient.invalidateQueries({ queryKey: ["project-analytics"] });
+
+    toast.success(`${count} demo tasks generated`);
+  };
 
   useEffect(() => {
     if (searchParams.get("demo") === "true") {
@@ -81,13 +102,25 @@ export const WorkspaceIdClient = () => {
   return (
     <div className="h-full flex flex-col space-y-4">
       {isDemo && (
-        <div className="rounded-lg border bg-muted p-4">
-          <p className="font-medium">Demo Mode</p>
-          <p className="text-sm text-muted-foreground">
-            Changes are stored locally and won&apos;t affect other users.
-          </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted p-4">
+          <div>
+            <p className="font-medium">Demo Mode</p>
+            <p className="text-sm text-muted-foreground">
+              Changes are stored locally and won&apos;t affect other users.
+            </p>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleGenerateDemoTasks}
+          >
+            Generate 20 tasks
+          </Button>
         </div>
       )}
+
       <Analytics data={analytics} />
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <TaskList data={taskRows} total={tasks.total} />
