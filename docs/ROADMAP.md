@@ -52,3 +52,7 @@ Audit date: 2026-10-22
 - [ ] Dashboard task widget grows too tall when many tasks exist.
       Limit the preview to 4 tasks, display the remaining count
       (+X more), and preserve the existing "Show all" action.
+- [ ] Improve dashboard widget background consistency.
+      Use bg-muted for the main dashboard widget containers
+      to match the Demo Mode alert styling while preserving
+      contrast between widgets and their inner cards.
