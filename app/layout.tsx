@@ -13,9 +13,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Coordina - Project Management",
+  title: {
+    default: "Coordina | Project Management",
+    template: "%s | Coordina",
+  },
   description:
-    "A modern project management tool to streamline your workflow and boost productivity.",
+    "Coordina is a project management application for organizing workspaces, projects, and tasks in one place.",
   manifest: "/manifest.json",
   icons: {
     icon: [
