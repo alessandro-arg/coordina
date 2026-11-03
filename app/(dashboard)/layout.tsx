@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { Sidebar } from "@/components/sidebar";
@@ -7,6 +8,13 @@ import { CreateWorkspaceModal } from "../features/workspaces/components/create-w
 import { CreateProjectModal } from "../features/projects/components/create-project-modal";
 import { CreateTaskModal } from "../features/tasks/components/create-task-modal";
 import { EditTaskModal } from "../features/tasks/components/edit-task-modal";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

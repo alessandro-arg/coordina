@@ -1,7 +1,15 @@
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { UserButton } from "../features/auth/components/user-button";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 interface StandaloneLayoutProps {
   children: React.ReactNode;
