@@ -49,3 +49,6 @@ Audit date: 2026-10-22
 
 - [ ] Workspace invitation link fails to load workspace information.
 - [ ] Member cards overflow when names or email addresses are too long.
+- [ ] Dashboard task widget grows too tall when many tasks exist.
+      Limit the preview to 4 tasks, display the remaining count
+      (+X more), and preserve the existing "Show all" action.
