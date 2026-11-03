@@ -3,7 +3,7 @@ import { Project } from "../../projects/types";
 import { Member } from "../../members/types";
 import { TaskStatus } from "../types";
 import { useWorkspaceId } from "../../workspaces/hooks/use-workspace-id";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface EventCardProps {
   title: string;
@@ -23,28 +23,22 @@ const statusColorMap: Record<TaskStatus, string> = {
 
 export const EventCard = ({ title, project, status, id }: EventCardProps) => {
   const workspaceId = useWorkspaceId();
-  const router = useRouter();
-
-  const onClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
-    router.push(`/workspaces/${workspaceId}/tasks/${id}`);
-  };
 
   if (!project?.name) {
     return null;
   }
 
   return (
-    <div
-      onClick={onClick}
+    <Link
+      href={`/workspaces/${workspaceId}/tasks/${id}`}
+      onClick={(e) => e.stopPropagation()}
       title={title}
       className={cn(
-        "flex h-5 w-full min-w-0 cursor-pointer items-center overflow-hidden rounded-sm border-l-[3px] bg-card px-1.5 ml-1 text-xs text-foreground transition-colors hover:bg-accent/70",
+        "flex h-5 w-full min-w-0 items-center overflow-hidden rounded-sm border-l-[3px] bg-card px-1.5 ml-1 text-xs text-foreground transition-colors hover:bg-accent/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         statusColorMap[status],
       )}
     >
       <span className="min-w-0 flex-1 truncate">{title}</span>
-    </div>
+    </Link>
   );
 };
