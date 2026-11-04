@@ -45,7 +45,14 @@ export const WorkspaceIdClient = () => {
   const handleGenerateDemoTasks = () => {
     if (!isDemo) return;
 
-    const count = generateDemoTasks(workspaceId);
+    let count: number;
+
+    try {
+      count = generateDemoTasks(workspaceId);
+    } catch {
+      toast.error("Could not save demo tasks. Local demo storage may be full.");
+      return;
+    }
 
     if (count === 0) {
       toast.error("Demo projects or members are missing.");
