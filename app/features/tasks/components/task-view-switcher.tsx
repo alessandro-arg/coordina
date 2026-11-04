@@ -106,7 +106,8 @@ export const TaskViewSwitcher = ({
         </div>
         <Separator className="my-4" />
         <DataFilters hideProjectFilter={hideProjectFilter} />
-        <Separator className="my-4" />
+        <Separator className="my-4 block lg:hidden" />
+        <div className="py-0 hidden lg:block lg:py-4" />
         {isLoadingTasks ? (
           <div className="w-full border rounded-lg h-50 flex flex-col items-center justify-center">
             <LoaderCircle className="size-5 animate-spin text-muted-foreground" />
