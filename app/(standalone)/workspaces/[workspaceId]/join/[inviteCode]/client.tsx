@@ -20,9 +20,9 @@ export const WorkspaceIdJoinClient = () => {
 
   useEffect(() => {
     if (initialValues?.isMember) {
-      router.replace(`/workspaces/${workspaceId}`);
+      router.replace(`/workspaces/${initialValues.$id}`);
     }
-  }, [initialValues?.isMember, router, workspaceId]);
+  }, [initialValues?.isMember, initialValues?.$id, router]);
 
   if (isLoading || initialValues?.isMember) {
     return <PageLoader />;

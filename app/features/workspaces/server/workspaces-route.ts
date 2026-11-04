@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { isObjectIdOrHexString } from "mongoose";
 import { zValidator } from "@hono/zod-validator";
 
 import { sessionMiddleware } from "@/lib/session-middleware";
@@ -160,6 +161,10 @@ const app = new Hono()
       const { inviteCode } = c.req.valid("query");
       const user = c.get("user");
 
+      if (!isObjectIdOrHexString(workspaceId)) {
+        return c.json({ error: "Workspace not found" }, 404);
+      }
+
       await connectToDatabase();
 
       const workspace = await WorkspaceModel.findById(workspaceId).lean();
@@ -173,7 +178,7 @@ const app = new Hono()
       }
 
       const existingMember = await getMember({
-        workspaceId,
+        workspaceId: String(workspace._id),
         userId: user.id,
       });
 
@@ -197,16 +202,11 @@ const app = new Hono()
       const { workspaceId } = c.req.param();
       const { inviteCode } = c.req.valid("json");
 
-      await connectToDatabase();
-
-      const existingMember = await getMember({
-        workspaceId,
-        userId: user.id,
-      });
-
-      if (existingMember) {
-        return c.json({ error: "Already a member" }, 400);
+      if (!isObjectIdOrHexString(workspaceId)) {
+        return c.json({ error: "Workspace not found" }, 404);
       }
+
+      await connectToDatabase();
 
       const workspace = await WorkspaceModel.findById(workspaceId).lean();
 
@@ -218,8 +218,19 @@ const app = new Hono()
         return c.json({ error: "Invalid invite code" }, 400);
       }
 
+      const canonicalWorkspaceId = String(workspace._id);
+
+      const existingMember = await getMember({
+        workspaceId: canonicalWorkspaceId,
+        userId: user.id,
+      });
+
+      if (existingMember) {
+        return c.json({ error: "Already a member" }, 400);
+      }
+
       await MemberModel.create({
-        workspaceId,
+        workspaceId: canonicalWorkspaceId,
         userId: user.id,
         role: MemberRole.MEMBER,
       });

@@ -15,7 +15,13 @@ export const useGetWorkspaceInfo = ({
   const { data: user } = useCurrent();
 
   const query = useQuery({
-    queryKey: ["workspace-info", workspaceId, inviteCode, user?.isDemo],
+    queryKey: [
+      "workspace-info",
+      workspaceId,
+      inviteCode,
+      user?.id,
+      user?.isDemo,
+    ],
     queryFn: async () => {
       if (user?.isDemo) {
         const demoData = getDemoData();
