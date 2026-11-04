@@ -162,7 +162,7 @@ export const TaskList = ({ data, total }: TaskListProps) => {
       <div className="bg-neutral-100 dark:bg-muted border rounded-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Tasks ({total})</p>
-          <Button variant="muted" size="icon" onClick={createTask}>
+          <Button variant="secondary" size="icon" onClick={createTask}>
             <PlusIcon className="size-5 text-neutral-400" />
           </Button>
         </div>
@@ -276,18 +276,25 @@ export const MembersList = ({ data, total }: MembersListProps) => {
         <Separator className="my-4" />
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {data.map((member) => (
-            <li key={member.$id}>
+            <li key={member.$id} className="min-w-0">
               <Card className="bg-neutral-200/50 dark:bg-background shadow-none rounded-lg overflow-hidden py-0">
-                <CardContent className="p-3 flex flex-col items-center gap-x-2">
+                <CardContent className="flex min-w-0 flex-col items-center gap-y-2 p-3">
                   <MemberAvatar
                     name={member.name ?? "User"}
-                    className="size-12"
+                    className="size-12 shrink-0"
                   />
-                  <div className="flex flex-col items-center overflow-hidden">
-                    <p className="text-lg font-medium line-clamp-1">
+                  <div className="flex w-full min-w-0 flex-col items-center">
+                    <p
+                      className="w-full truncate text-center text-lg font-medium"
+                      title={member.name ?? undefined}
+                    >
                       {member.name}
                     </p>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
+
+                    <p
+                      className="w-full truncate text-center text-sm text-muted-foreground"
+                      title={member.email ?? undefined}
+                    >
                       {member.email}
                     </p>
                   </div>

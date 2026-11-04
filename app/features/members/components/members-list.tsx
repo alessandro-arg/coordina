@@ -58,7 +58,7 @@ export const MemberList = () => {
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="w-full h-full bg-neutral-100 dark:bg-muted border">
       <ConfirmDialog />
       <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
         <Link href={`/workspaces/${workspaceId}`}>
