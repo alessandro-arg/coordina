@@ -82,7 +82,7 @@ export const EditWorkspaceForm = ({
       { param: { workspaceId: initialValues.$id } },
       {
         onSuccess: () => {
-          window.location.href = "/";
+          router.replace("/");
         },
       },
     );
