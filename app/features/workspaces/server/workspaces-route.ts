@@ -151,35 +151,42 @@ const app = new Hono()
     },
   )
 
-  .get("/:workspaceId/info", sessionMiddleware, async (c) => {
-    const user = c.get("user");
-    const { workspaceId } = c.req.param();
+  .get(
+    "/:workspaceId/info",
+    sessionMiddleware,
+    zValidator("query", z.object({ inviteCode: z.string().min(1) })),
+    async (c) => {
+      const { workspaceId } = c.req.param();
+      const { inviteCode } = c.req.valid("query");
+      const user = c.get("user");
 
-    await connectToDatabase();
+      await connectToDatabase();
 
-    const member = await getMember({
-      workspaceId,
-      userId: user.id,
-    });
+      const workspace = await WorkspaceModel.findById(workspaceId).lean();
 
-    if (!member) {
-      return c.json({ error: "Unauthorized" }, 403);
-    }
+      if (!workspace) {
+        return c.json({ error: "Workspace not found" }, 404);
+      }
 
-    const workspace = await WorkspaceModel.findById(workspaceId).lean();
+      if (workspace.inviteCode !== inviteCode) {
+        return c.json({ error: "Invalid invite code" }, 403);
+      }
 
-    if (!workspace) {
-      return c.json({ error: "Workspace not found" }, 404);
-    }
+      const existingMember = await getMember({
+        workspaceId,
+        userId: user.id,
+      });
 
-    return c.json({
-      data: {
-        $id: String(workspace._id),
-        name: workspace.name,
-        imageUrl: workspace.imageUrl,
-      },
-    });
-  })
+      return c.json({
+        data: {
+          $id: String(workspace._id),
+          name: workspace.name,
+          imageUrl: workspace.imageUrl,
+          isMember: Boolean(existingMember),
+        },
+      });
+    },
+  )
 
   .post(
     "/:workspaceId/join",

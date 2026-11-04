@@ -5,15 +5,17 @@ import { getDemoData } from "@/lib/demo-storage";
 
 interface useGetWorkspaceInfoProps {
   workspaceId: string;
+  inviteCode: string;
 }
 
 export const useGetWorkspaceInfo = ({
   workspaceId,
+  inviteCode,
 }: useGetWorkspaceInfoProps) => {
   const { data: user } = useCurrent();
 
   const query = useQuery({
-    queryKey: ["workspace-info", workspaceId, user?.isDemo],
+    queryKey: ["workspace-info", workspaceId, inviteCode, user?.isDemo],
     queryFn: async () => {
       if (user?.isDemo) {
         const demoData = getDemoData();
@@ -26,16 +28,22 @@ export const useGetWorkspaceInfo = ({
           throw new Error("Demo workspace not found");
         }
 
+        if (workspace.inviteCode !== inviteCode) {
+          throw new Error("Invalid invite code");
+        }
+
         return {
           $id: workspace.$id,
           name: workspace.name,
           imageUrl: workspace.imageUrl,
+          isMember: true,
         };
       }
 
       const response = await client.api.workspaces[":workspaceId"]["info"].$get(
         {
           param: { workspaceId },
+          query: { inviteCode },
         },
       );
 
@@ -47,7 +55,7 @@ export const useGetWorkspaceInfo = ({
 
       return data;
     },
-    enabled: !!workspaceId && user !== undefined,
+    enabled: !!workspaceId && !!inviteCode && user !== undefined,
   });
 
   return query;
