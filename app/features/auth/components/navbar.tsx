@@ -14,6 +14,14 @@ const pathnameMap = {
     title: "My project",
     description: "View the tasks of your project here",
   },
+  settings: {
+    title: "Settings",
+    description: "Manage your workspace settings",
+  },
+  members: {
+    title: "Members",
+    description: "Manage your workspace members",
+  },
 };
 
 const defaultMap = {
@@ -29,7 +37,7 @@ export const Navbar = () => {
   const { title, description } = pathnameMap[pathnameKey] || defaultMap;
 
   return (
-    <nav className="pt-4 px-6 flex items-center justify-between">
+    <nav className="sticky top-0 z-30 flex min-h-20 items-center justify-between border-b bg-neutral-100 px-6 dark:bg-muted">
       <div className="flex-col hidden lg:flex">
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p className="text-muted-foreground">{description}</p>

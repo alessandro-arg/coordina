@@ -1,8 +1,7 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { UserButton } from "../features/auth/components/user-button";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Navbar } from "../features/auth/components/navbar";
 
 export const metadata: Metadata = {
   robots: {
@@ -17,37 +16,40 @@ interface StandaloneLayoutProps {
 
 const StandaloneLayout = ({ children }: StandaloneLayoutProps) => {
   return (
-    <main className="bg-neutral-100 dark:bg-background min-h-screen">
-      <div className="mx-auto max-w-screen-2xl p-4">
-        <nav className="flex justify-between items-center h-[73px]">
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-30 flex w-full bg-neutral-100 dark:bg-muted">
+        {/* Desktop logo */}
+        <div className="hidden h-20 w-[264px] shrink-0 items-center border-b border-r px-4 lg:flex">
           <Link href="/">
             <Image
               src="/logo.svg"
-              alt="logo"
+              alt="Coordina"
               width={164}
               height={48}
               loading="eager"
-              className="w-41 h-12 dark:hidden"
+              className="h-12 w-41 dark:hidden"
             />
             <Image
               src="/logo-dark.svg"
-              alt="logo"
+              alt="Coordina"
               width={164}
               height={48}
               loading="eager"
-              className="w-41 h-12 hidden dark:block"
+              className="hidden h-12 w-41 dark:block"
             />
           </Link>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <UserButton />
-          </div>
-        </nav>
-        <div className="flex flex-col items-center justify-center py-4">
-          {children}
+        </div>
+
+        {/* Shared dashboard navbar */}
+        <div className="min-w-0 flex-1">
+          <Navbar />
         </div>
       </div>
-    </main>
+
+      <div className="flex flex-col items-center justify-center py-4">
+        {children}
+      </div>
+    </div>
   );
 };
 
