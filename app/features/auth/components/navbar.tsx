@@ -22,6 +22,10 @@ const pathnameMap = {
     title: "Members",
     description: "Manage your workspace members",
   },
+  join: {
+    title: "Join workspace",
+    description: "Accept a workspace invitation",
+  },
 };
 
 const defaultMap = {
@@ -29,7 +33,11 @@ const defaultMap = {
   description: "Monitor all of your projects and tasks",
 };
 
-export const Navbar = () => {
+interface NavbarProps {
+  showCreateButtons?: boolean;
+}
+
+export const Navbar = ({ showCreateButtons = true }: NavbarProps) => {
   const pathname = usePathname();
   const pathnameParts = pathname.split("/");
   const pathnameKey = pathnameParts[3] as keyof typeof pathnameMap;
@@ -42,7 +50,7 @@ export const Navbar = () => {
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p className="text-muted-foreground">{description}</p>
       </div>
-      <MobileSidebar />
+      <MobileSidebar showCreateButtons={showCreateButtons} />
       <div className="flex items-center gap-4">
         <ThemeToggle />
         <UserButton />

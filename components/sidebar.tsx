@@ -5,7 +5,11 @@ import { Navigation } from "./navigation";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { Projects } from "./projects";
 
-export const Sidebar = () => {
+interface SidebarProps {
+  showCreateButtons?: boolean;
+}
+
+export const Sidebar = ({ showCreateButtons = true }: SidebarProps) => {
   return (
     <aside className="h-full w-full lg:border-r bg-neutral-100 p-4 dark:bg-muted">
       <Link href="/">
@@ -28,11 +32,11 @@ export const Sidebar = () => {
       </Link>
       <div className="my-[15px] h-px bg-border -mx-4 hidden lg:block" />
       <Separator className="my-4 lg:hidden" />
-      <WorkspaceSwitcher />
+      <WorkspaceSwitcher showCreateButtons={showCreateButtons} />
       <Separator className="my-4" />
       <Navigation />
       <Separator className="my-4" />
-      <Projects />
+      <Projects showCreateButtons={showCreateButtons} />
     </aside>
   );
 };

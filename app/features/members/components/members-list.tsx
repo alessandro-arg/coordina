@@ -81,13 +81,13 @@ export const MemberList = () => {
             <Fragment key={member.$id}>
               <div className="flex items-center gap-2">
                 <MemberAvatar
-                  className="size-10"
+                  className="size-10 shrink-0"
                   fallbackClassName="text-lg"
-                  name={member.name ?? "User"}
+                  name={member.name || "User"}
                 />
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium">
-                    {member.name ?? "User"}
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <p className="break-words text-sm font-medium">
+                    {member.name || "User"}
                     {member.role === MemberRole.ADMIN && (
                       <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-muted text-blue-700 dark:text-blue-500 font-semibold ml-2">
                         ADMIN
@@ -100,8 +100,8 @@ export const MemberList = () => {
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {member.email ?? "No email"}
+                  <p className="break-all text-xs text-muted-foreground">
+                    {member.email || "No email"}
                   </p>
                 </div>
 
@@ -109,7 +109,7 @@ export const MemberList = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        className="ml-auto"
+                        className="ml-auto shrink-0"
                         variant="secondary"
                         size="icon"
                       >
@@ -144,7 +144,7 @@ export const MemberList = () => {
                         onClick={() => handleDeleteMember(member.$id)}
                         disabled={isDeletingMember}
                       >
-                        Remove {member.name ?? "User"}
+                        Remove {member.name || "User"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -10,7 +10,11 @@ import { usePathname } from "next/navigation";
 import { RiAddCircleFill } from "react-icons/ri";
 import { NavigationPendingIndicator } from "./navigation-pending-indicator";
 
-export const Projects = () => {
+interface ProjectsProps {
+  showCreateButtons?: boolean;
+}
+
+export const Projects = ({ showCreateButtons = true }: ProjectsProps) => {
   const pathname = usePathname();
   const { open } = useCreateProjectModal();
   const workspaceId = useWorkspaceId();
@@ -24,10 +28,12 @@ export const Projects = () => {
         <p className="text-sm font-medium uppercase text-muted-foreground">
           Projects
         </p>
-        <RiAddCircleFill
-          onClick={open}
-          className="size-5 text-muted-foreground cursor-pointer hover:opacity-75 transition"
-        />
+        {showCreateButtons && (
+          <RiAddCircleFill
+            onClick={open}
+            className="size-5 text-muted-foreground cursor-pointer hover:opacity-75 transition"
+          />
+        )}
       </div>
       {data?.rows.map((project) => {
         const href = `/workspaces/${workspaceId}/projects/${project.$id}`;

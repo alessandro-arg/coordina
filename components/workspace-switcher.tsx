@@ -14,7 +14,13 @@ import { useRouter } from "next/navigation";
 import { useWorkspaceId } from "@/app/features/workspaces/hooks/use-workspace-id";
 import { useCreateWorkspaceModal } from "@/app/features/workspaces/hooks/use-create-workspace-modal";
 
-export const WorkspaceSwitcher = () => {
+interface WorkspaceSwitcherProps {
+  showCreateButtons?: boolean;
+}
+
+export const WorkspaceSwitcher = ({
+  showCreateButtons = true,
+}: WorkspaceSwitcherProps) => {
   const workspaceId = useWorkspaceId();
   const router = useRouter();
   const { data: workspaces } = useGetWorkspaces();
@@ -30,10 +36,12 @@ export const WorkspaceSwitcher = () => {
         <p className="text-sm font-medium uppercase text-muted-foreground">
           Workspaces
         </p>
-        <RiAddCircleFill
-          onClick={open}
-          className="size-5 text-muted-foreground cursor-pointer hover:opacity-75 transition"
-        />
+        {showCreateButtons && (
+          <RiAddCircleFill
+            onClick={open}
+            className="size-5 text-muted-foreground cursor-pointer hover:opacity-75 transition"
+          />
+        )}
       </div>
       <Select onValueChange={onSelect} value={workspaceId}>
         <SelectTrigger className="w-full font-medium p-1">

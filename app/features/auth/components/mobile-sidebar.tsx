@@ -13,7 +13,13 @@ import { MenuIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export const MobileSidebar = () => {
+interface MobileSidebarProps {
+  showCreateButtons?: boolean;
+}
+
+export const MobileSidebar = ({
+  showCreateButtons = true,
+}: MobileSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -37,7 +43,7 @@ export const MobileSidebar = () => {
         <SheetHeader className="sr-only">
           <SheetTitle>Navigation</SheetTitle>
         </SheetHeader>
-        <Sidebar />
+        <Sidebar showCreateButtons={showCreateButtons} />
       </SheetContent>
     </Sheet>
   );
