@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useWorkspaceId } from "@/app/features/workspaces/hooks/use-workspace-id";
 import { useCreateWorkspaceModal } from "@/app/features/workspaces/hooks/use-create-workspace-modal";
 
-export const WorkspaceSwithcer = () => {
+export const WorkspaceSwitcher = () => {
   const workspaceId = useWorkspaceId();
   const router = useRouter();
   const { data: workspaces } = useGetWorkspaces();
@@ -36,7 +36,7 @@ export const WorkspaceSwithcer = () => {
         />
       </div>
       <Select onValueChange={onSelect} value={workspaceId}>
-        <SelectTrigger className="w-full bg-secondary font-medium p-1">
+        <SelectTrigger className="w-full font-medium p-1">
           <SelectValue placeholder="No workspace selected" />
         </SelectTrigger>
         <SelectContent>

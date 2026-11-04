@@ -37,8 +37,8 @@ export const Projects = () => {
           <Link href={href} key={project.$id}>
             <div
               className={cn(
-                "flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer",
-                isActive && "bg-muted shadow-sm hover:opacity-100 text-primary",
+                "flex items-center gap-2.5 rounded-md border border-transparent p-2.5 transition-colors hover:text-primary",
+                isActive && "border-border bg-background text-primary",
               )}
             >
               <ProjectAvatar
