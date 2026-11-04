@@ -24,7 +24,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
 - [x] Mobile task views
 - [x] Calendar improvements
 - [x] Lightweight SEO improvements
-- [ ] Final accessibility and performance review
+- [x] Final accessibility and performance review
 
 ## Development workflow
 
@@ -56,3 +56,12 @@ Audit date: 2026-10-22
       Use bg-muted for the main dashboard widget containers
       to match the Demo Mode alert styling while preserving
       contrast between widgets and their inner cards.
+
+## Final review notes
+
+- Verified dashboard, task views, navigation, and responsive layouts.
+- Tested workspace invitations and member management.
+- Verified Kanban changes persist after reload.
+- Confirmed workspace deletion redirects correctly.
+- Production build and TypeScript checks pass.
+- Remaining ESLint warnings are non-blocking.
