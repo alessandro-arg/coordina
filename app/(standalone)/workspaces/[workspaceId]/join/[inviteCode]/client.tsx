@@ -13,23 +13,40 @@ export const WorkspaceIdJoinClient = () => {
   const inviteCode = useInviteCode();
   const router = useRouter();
 
-  const { data: initialValues, isLoading } = useGetWorkspaceInfo({
+  const {
+    data: initialValues,
+    isFetching,
+    isFetchedAfterMount,
+    isError,
+  } = useGetWorkspaceInfo({
     workspaceId,
     inviteCode,
   });
 
+  const hasFreshResult = isFetchedAfterMount && !isFetching;
+
   useEffect(() => {
-    if (initialValues?.isMember) {
+    if (hasFreshResult && !isError && initialValues?.isMember) {
       router.replace(`/workspaces/${initialValues.$id}`);
     }
-  }, [initialValues?.isMember, initialValues?.$id, router]);
+  }, [
+    hasFreshResult,
+    isError,
+    initialValues?.isMember,
+    initialValues?.$id,
+    router,
+  ]);
 
-  if (isLoading || initialValues?.isMember) {
+  if (!hasFreshResult) {
     return <PageLoader />;
   }
 
-  if (!initialValues) {
+  if (isError || !initialValues) {
     return <PageError message="Workspace info not found" />;
+  }
+
+  if (initialValues.isMember) {
+    return <PageLoader />;
   }
 
   return (

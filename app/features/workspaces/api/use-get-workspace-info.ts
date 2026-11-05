@@ -62,6 +62,7 @@ export const useGetWorkspaceInfo = ({
       return data;
     },
     enabled: !!workspaceId && !!inviteCode && user !== undefined,
+    refetchOnMount: "always",
   });
 
   return query;
