@@ -7,9 +7,13 @@ import { Projects } from "./projects";
 
 interface SidebarProps {
   showCreateButtons?: boolean;
+  showWorkspaceNavigation?: boolean;
 }
 
-export const Sidebar = ({ showCreateButtons = true }: SidebarProps) => {
+export const Sidebar = ({
+  showCreateButtons = true,
+  showWorkspaceNavigation = true,
+}: SidebarProps) => {
   return (
     <aside className="h-full w-full lg:border-r bg-neutral-100 p-4 dark:bg-muted">
       <Link href="/">
@@ -33,10 +37,14 @@ export const Sidebar = ({ showCreateButtons = true }: SidebarProps) => {
       <div className="my-[15px] h-px bg-border -mx-4 hidden lg:block" />
       <Separator className="my-4 lg:hidden" />
       <WorkspaceSwitcher showCreateButtons={showCreateButtons} />
-      <Separator className="my-4" />
-      <Navigation />
-      <Separator className="my-4" />
-      <Projects showCreateButtons={showCreateButtons} />
+      {showWorkspaceNavigation && (
+        <>
+          <Separator className="my-4" />
+          <Navigation />
+          <Separator className="my-4" />
+          <Projects showCreateButtons={showCreateButtons} />
+        </>
+      )}
     </aside>
   );
 };

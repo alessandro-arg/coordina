@@ -35,9 +35,13 @@ const defaultMap = {
 
 interface NavbarProps {
   showCreateButtons?: boolean;
+  showWorkspaceNavigation?: boolean;
 }
 
-export const Navbar = ({ showCreateButtons = true }: NavbarProps) => {
+export const Navbar = ({
+  showCreateButtons = true,
+  showWorkspaceNavigation = true,
+}: NavbarProps) => {
   const pathname = usePathname();
   const pathnameParts = pathname.split("/");
   const pathnameKey = pathnameParts[3] as keyof typeof pathnameMap;
@@ -50,7 +54,10 @@ export const Navbar = ({ showCreateButtons = true }: NavbarProps) => {
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p className="text-muted-foreground">{description}</p>
       </div>
-      <MobileSidebar showCreateButtons={showCreateButtons} />
+      <MobileSidebar
+        showCreateButtons={showCreateButtons}
+        showWorkspaceNavigation={showWorkspaceNavigation}
+      />
       <div className="flex items-center gap-4">
         <ThemeToggle />
         <UserButton />

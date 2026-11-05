@@ -15,10 +15,12 @@ import { useEffect, useState } from "react";
 
 interface MobileSidebarProps {
   showCreateButtons?: boolean;
+  showWorkspaceNavigation?: boolean;
 }
 
 export const MobileSidebar = ({
   showCreateButtons = true,
+  showWorkspaceNavigation = true,
 }: MobileSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -31,8 +33,15 @@ export const MobileSidebar = ({
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="secondary" className="lg:hidden">
-          <MenuIcon className="size-4 text-neutral-500 dark:text-primary" />
+        <Button
+          variant="secondary"
+          className="lg:hidden"
+          aria-label="Open navigation"
+        >
+          <MenuIcon
+            aria-hidden="true"
+            className="size-4 text-neutral-500 dark:text-primary"
+          />
         </Button>
       </SheetTrigger>
       <SheetContent
@@ -43,7 +52,10 @@ export const MobileSidebar = ({
         <SheetHeader className="sr-only">
           <SheetTitle>Navigation</SheetTitle>
         </SheetHeader>
-        <Sidebar showCreateButtons={showCreateButtons} />
+        <Sidebar
+          showCreateButtons={showCreateButtons}
+          showWorkspaceNavigation={showWorkspaceNavigation}
+        />
       </SheetContent>
     </Sheet>
   );

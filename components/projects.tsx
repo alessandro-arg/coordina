@@ -29,10 +29,14 @@ export const Projects = ({ showCreateButtons = true }: ProjectsProps) => {
           Projects
         </p>
         {showCreateButtons && (
-          <RiAddCircleFill
+          <button
+            type="button"
             onClick={open}
-            className="size-5 text-muted-foreground cursor-pointer hover:opacity-75 transition"
-          />
+            aria-label="Create project"
+            className="cursor-pointer rounded-sm p-1 text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <RiAddCircleFill aria-hidden="true" className="size-5" />
+          </button>
         )}
       </div>
       {data?.rows.map((project) => {

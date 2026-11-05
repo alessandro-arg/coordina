@@ -42,7 +42,7 @@ const StandaloneLayout = ({ children }: StandaloneLayoutProps) => {
 
         {/* Shared dashboard navbar */}
         <div className="min-w-0 flex-1">
-          <Navbar showCreateButtons={false} />
+          <Navbar showCreateButtons={false} showWorkspaceNavigation={false} />
         </div>
       </div>
 
