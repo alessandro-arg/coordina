@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { connectToDatabase } from "@/lib/db/connect";
-import { MemberModel, MemberRole } from "@/lib/db/models";
+import { MemberModel, MemberRole, UserModel } from "@/lib/db/models";
 import { getMember } from "../utils";
 
 const serializeMember = (member: {
@@ -44,16 +44,26 @@ const app = new Hono()
 
       const members = await MemberModel.find({ workspaceId }).lean();
 
-      const populatedMembers = members.map((member) =>
-        serializeMember({
+      const users = await UserModel.find({
+        _id: { $in: members.map((member) => member.userId) },
+      })
+        .select("name email")
+        .lean();
+
+      const usersById = new Map(users.map((user) => [String(user._id), user]));
+
+      const populatedMembers = members.map((member) => {
+        const memberUser = usersById.get(member.userId);
+
+        return serializeMember({
           _id: member._id,
           userId: member.userId,
           workspaceId: member.workspaceId,
           role: member.role,
-          name: member.userId === user.id ? (user.name ?? "") : "",
-          email: member.userId === user.id ? (user.email ?? "") : "",
-        }),
-      );
+          name: memberUser?.name ?? "",
+          email: memberUser?.email ?? "",
+        });
+      });
 
       return c.json({
         data: {

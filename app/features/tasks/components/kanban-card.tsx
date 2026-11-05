@@ -2,7 +2,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Task } from "../types";
 import { Button } from "@/components/ui/button";
 import { TaskActions } from "./task-actions";
-import DottedSeparator from "@/components/dotted-separator";
+import { Separator } from "@/components/ui/separator";
 import { MemberAvatar } from "../../members/components/members-avatar";
 import { TaskDate } from "./task-date";
 import { ProjectAvatar } from "../../projects/components/project-avatar";
@@ -36,7 +36,7 @@ export const KanbanCard = ({
           </Button>
         </TaskActions>
       </div>
-      <DottedSeparator />
+      <Separator />
       <div className="flex items-center gap-x-1.5">
         <MemberAvatar
           name={task.assignee?.name ?? task.assigneeId}

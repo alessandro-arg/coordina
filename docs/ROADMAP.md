@@ -24,7 +24,7 @@ Improve maintainability, security, navigation performance, and responsive usabil
 - [x] Mobile task views
 - [x] Calendar improvements
 - [x] Lightweight SEO improvements
-- [ ] Final accessibility and performance review
+- [x] Final accessibility and performance review
 
 ## Development workflow
 
@@ -47,8 +47,21 @@ Audit date: 2026-10-22
 
 ## Known issues
 
-- [ ] Workspace invitation link fails to load workspace information.
-- [ ] Member cards overflow when names or email addresses are too long.
-- [ ] Dashboard task widget grows too tall when many tasks exist.
+- [x] Workspace invitation link fails to load workspace information.
+- [x] Member cards overflow when names or email addresses are too long.
+- [x] Dashboard task widget grows too tall when many tasks exist.
       Limit the preview to 4 tasks, display the remaining count
       (+X more), and preserve the existing "Show all" action.
+- [x] Improve dashboard widget background consistency.
+      Use bg-muted for the main dashboard widget containers
+      to match the Demo Mode alert styling while preserving
+      contrast between widgets and their inner cards.
+
+## Final review notes
+
+- Verified dashboard, task views, navigation, and responsive layouts.
+- Tested workspace invitations and member management.
+- Verified Kanban changes persist after reload.
+- Confirmed workspace deletion redirects correctly.
+- Production build and TypeScript checks pass.
+- Remaining ESLint warnings are non-blocking.

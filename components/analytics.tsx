@@ -1,11 +1,11 @@
 import { ProjectAnalyticsResponseType } from "@/app/features/projects/api/use-get-project-analytics";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { AnalyticsCard } from "./analytics-card";
-import DottedSeparator from "./dotted-separator";
+import { Separator } from "@/components/ui/separator";
 
 export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
   return (
-    <ScrollArea className="border rounded-lg w-full whitespace-nowrap shrink-0">
+    <ScrollArea className="bg-neutral-100 dark:bg-muted border rounded-lg w-full whitespace-nowrap shrink-0">
       <div className="w-full flex flex-row">
         <div className="flex items-center shrink-0 min-w-[170px] lg:flex-1">
           <AnalyticsCard
@@ -14,7 +14,7 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
             variant={data.taskDifference > 0 ? "up" : "down"}
             increaseValue={data.taskDifference}
           />
-          <DottedSeparator direction="vertical" />
+          <Separator orientation="vertical" />
         </div>
         <div className="flex items-center shrink-0 min-w-[210px] lg:flex-1">
           <AnalyticsCard
@@ -23,7 +23,7 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
             variant={data.assignedTaskDifference > 0 ? "up" : "down"}
             increaseValue={data.assignedTaskDifference}
           />
-          <DottedSeparator direction="vertical" />
+          <Separator orientation="vertical" />
         </div>
         <div className="flex items-center shrink-0 min-w-[220px] lg:flex-1">
           <AnalyticsCard
@@ -32,7 +32,7 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
             variant={data.completedTaskDifference > 0 ? "up" : "down"}
             increaseValue={data.completedTaskDifference}
           />
-          <DottedSeparator direction="vertical" />
+          <Separator orientation="vertical" />
         </div>
         <div className="flex items-center shrink-0 min-w-[200px] lg:flex-1">
           <AnalyticsCard
@@ -41,7 +41,7 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
             variant={data.overdueTaskDifference > 0 ? "down" : "up"}
             increaseValue={data.overdueTaskDifference}
           />
-          <DottedSeparator direction="vertical" />
+          <Separator orientation="vertical" />
         </div>
         <div className="flex items-center shrink min-w-[220px] lg:flex-1">
           <AnalyticsCard

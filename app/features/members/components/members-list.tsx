@@ -5,7 +5,6 @@ import { useWorkspaceId } from "../../workspaces/hooks/use-workspace-id";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeftCircleIcon, MoreVerticalIcon } from "lucide-react";
 import Link from "next/link";
-import DottedSeparator from "@/components/dotted-separator";
 import { useGetMembers } from "../../members/api/use-get-members";
 import { Fragment } from "react/jsx-runtime";
 import { MemberAvatar } from "../../members/components/members-avatar";
@@ -59,7 +58,7 @@ export const MemberList = () => {
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="w-full h-full bg-neutral-100 dark:bg-muted border">
       <ConfirmDialog />
       <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
         <Link href={`/workspaces/${workspaceId}`}>
@@ -71,7 +70,7 @@ export const MemberList = () => {
         <CardTitle className="text-xl font-bold">Members list</CardTitle>
       </CardHeader>
       <div className="px-7">
-        <DottedSeparator />
+        <Separator />
       </div>
       <CardContent className="p-7">
         {data?.rows.map((member, index) => {
@@ -82,13 +81,13 @@ export const MemberList = () => {
             <Fragment key={member.$id}>
               <div className="flex items-center gap-2">
                 <MemberAvatar
-                  className="size-10"
+                  className="size-10 shrink-0"
                   fallbackClassName="text-lg"
-                  name={member.name ?? "User"}
+                  name={member.name || "User"}
                 />
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium">
-                    {member.name ?? "User"}
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <p className="break-words text-sm font-medium">
+                    {member.name || "User"}
                     {member.role === MemberRole.ADMIN && (
                       <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-muted text-blue-700 dark:text-blue-500 font-semibold ml-2">
                         ADMIN
@@ -101,8 +100,8 @@ export const MemberList = () => {
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {member.email ?? "No email"}
+                  <p className="break-all text-xs text-muted-foreground">
+                    {member.email || "No email"}
                   </p>
                 </div>
 
@@ -110,7 +109,7 @@ export const MemberList = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        className="ml-auto"
+                        className="ml-auto shrink-0"
                         variant="secondary"
                         size="icon"
                       >
@@ -145,7 +144,7 @@ export const MemberList = () => {
                         onClick={() => handleDeleteMember(member.$id)}
                         disabled={isDeletingMember}
                       >
-                        Remove {member.name ?? "User"}
+                        Remove {member.name || "User"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

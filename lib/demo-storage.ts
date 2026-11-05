@@ -170,3 +170,78 @@ export function resetDemoData() {
 export function createDemoId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
 }
+
+export function generateDemoTasks(workspaceId: string): number {
+  const demoData = getDemoData();
+
+  const projects = demoData.projects.filter(
+    (project) => project.workspaceId === workspaceId,
+  );
+
+  const members = demoData.members.filter(
+    (member) => member.workspaceId === workspaceId,
+  );
+
+  if (!projects.length || !members.length) {
+    return 0;
+  }
+
+  const titles = [
+    "Design landing page",
+    "Fix mobile navigation",
+    "Review pull requests",
+    "Implement search filters",
+    "Update project documentation",
+    "Optimize dashboard performance",
+    "Test authentication flow",
+    "Create onboarding screens",
+    "Improve form validation",
+    "Fix responsive layout",
+    "Add notification preferences",
+    "Review accessibility issues",
+    "Prepare release notes",
+    "Refactor API handlers",
+    "Test Kanban drag and drop",
+    "Update user settings",
+    "Investigate loading states",
+    "Improve error handling",
+    "Design project overview",
+    "Run regression tests",
+  ];
+
+  const statuses = Object.values(TaskStatus);
+  const tasks = [...demoData.tasks];
+
+  for (const [index, name] of titles.entries()) {
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+
+    const dueDate = new Date();
+    const daysOffset = index < 6 ? 0 : Math.floor(Math.random() * 45) - 10;
+
+    dueDate.setDate(dueDate.getDate() + daysOffset);
+
+    const highestPosition = tasks.reduce(
+      (max, task) =>
+        task.workspaceId === workspaceId && task.status === status
+          ? Math.max(max, task.position)
+          : max,
+      0,
+    );
+
+    tasks.push({
+      $id: createDemoId("demo-task"),
+      name,
+      status,
+      workspaceId,
+      projectId: projects[Math.floor(Math.random() * projects.length)].$id,
+      assigneeId: members[Math.floor(Math.random() * members.length)].$id,
+      position: highestPosition + 1000,
+      dueDate: dueDate.toISOString(),
+      description: "Generated sample task for demo testing.",
+    });
+  }
+
+  setDemoData({ ...demoData, tasks });
+
+  return titles.length;
+}

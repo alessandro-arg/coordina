@@ -56,11 +56,16 @@ export const Navigation = () => {
           <Link key={item.href} href={fullHref}>
             <div
               className={cn(
-                "flex items-center gap-2.5 p-2.5 rounded-md font-md hover:text-primary transition text-muted-foreground",
-                isActive && "bg-muted shadow-sm hover:opacity-100 text-primary",
+                "flex items-center gap-2.5 rounded-md border border-transparent p-2.5 text-muted-foreground transition-colors hover:text-primary",
+                isActive && "border-border bg-background text-primary",
               )}
             >
-              <Icon className="size-5 text-muted-foreground" />
+              <Icon
+                className={cn(
+                  "size-5",
+                  isActive ? "text-primary" : "text-muted-foreground",
+                )}
+              />
               {item.label}
               <NavigationPendingIndicator />
             </div>

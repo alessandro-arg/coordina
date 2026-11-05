@@ -10,7 +10,11 @@ import { usePathname } from "next/navigation";
 import { RiAddCircleFill } from "react-icons/ri";
 import { NavigationPendingIndicator } from "./navigation-pending-indicator";
 
-export const Projects = () => {
+interface ProjectsProps {
+  showCreateButtons?: boolean;
+}
+
+export const Projects = ({ showCreateButtons = true }: ProjectsProps) => {
   const pathname = usePathname();
   const { open } = useCreateProjectModal();
   const workspaceId = useWorkspaceId();
@@ -24,10 +28,16 @@ export const Projects = () => {
         <p className="text-sm font-medium uppercase text-muted-foreground">
           Projects
         </p>
-        <RiAddCircleFill
-          onClick={open}
-          className="size-5 text-muted-foreground cursor-pointer hover:opacity-75 transition"
-        />
+        {showCreateButtons && (
+          <button
+            type="button"
+            onClick={open}
+            aria-label="Create project"
+            className="cursor-pointer rounded-sm p-1 text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <RiAddCircleFill aria-hidden="true" className="size-5" />
+          </button>
+        )}
       </div>
       {data?.rows.map((project) => {
         const href = `/workspaces/${workspaceId}/projects/${project.$id}`;
@@ -37,8 +47,8 @@ export const Projects = () => {
           <Link href={href} key={project.$id}>
             <div
               className={cn(
-                "flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer",
-                isActive && "bg-muted shadow-sm hover:opacity-100 text-primary",
+                "flex items-center gap-2.5 rounded-md border border-transparent p-2.5 transition-colors hover:text-primary",
+                isActive && "border-border bg-background text-primary",
               )}
             >
               <ProjectAvatar
